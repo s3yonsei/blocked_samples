@@ -176,19 +176,68 @@ $ sudo sh -c 'echo 1 > /proc/sys/kernel/perf_event_paranoid'
 To profile the application with bperf and BCOZ, additional compile flags are needed. Following flags are needed to compile application and libraries that loaded dynamically. However, it is hard to compile all loaded libraries. Note that, to take full advantage of BCOZ (and COZ), libraries belonging to symbols in frequently sampled callchains must be compiled with the following flags. Otherwise, the results of virtual speedup will no be meaningful, or the predicted results will be inaccurate.
 
 ```bash
-CFLAGS+='-g -gdwarf-4 -fno-omit-frame-pointer -Wl,--no-as-needed -ldl -Wl,--rpath=/usr/local/lib/glibc-testing/lib -Wl,--dynamic-linker=/trusted/local/lib/glibc-testing/lib/ld-linux.so.2'
+-g -gdwarf-4 -fno-omit-frame-pointer -Wl,--no-as-needed -ldl -Wl,--rpath=/usr/local/lib/glibc-testing/lib -Wl,--dynamic-linker=/trusted/local/lib/glibc-testing/lib/ld-linux.so.2
 ```
 
 * '-g -gdwarf-4' is for debug information. Especially, gdwarf-4 is needed for BCOZ (and COZ).
 * '-fno-omit-frame-pointer' is for preserve frame pointer.
 * '-Wl,--no-as-needed -ldl -Wl,--rpath=/usr/local/lib/glibc-testing/lib' is for use newly built glibc library. *rpath* and *dynamic-linker* are directories of newly built glibc and dynamic loader in [glibc build](#2-glibc-build), respectively. If you followed instructions in part 2, you can use as written above.
 
-##### 5-1-4. How to add above flags?
-
 #### 5-2. bperf
 
-##### 5-2-1. 
+Note that, blocked samples are extension of recording task-clock event. Other than chaging the recording target, you can utilize all of the existing features of the Linux perf tool. Typical use cases are as follows.
+
+##### 5-2-1. Sampling IP only
+
+```bash
+[Record command]
+$ bperf record -e task-clock -c 1000000 --weight [command]
+
+[Record specific task]
+$ bperf record -e task-clock -c 1000000 --weight --tid=[tids]
+
+or
+
+$ bperf record -e task-clock -c 1000000 --weight --pid=[pids]
+```
+
+##### 5-2-2. Sampling both IP and callchain
+```bash
+[Record command]
+$ bperf record -g -e task-clock -c 1000000 --weight [command]
+
+[Record specific task]
+$ bperf record -g -e task-clock -c 1000000 --weight --tid=[tids]
+
+or
+
+$ bperf record -g -e task-clock -c 1000000 --weight --pid=[pids]
+```
+
+##### 5-2-3. Collect every single samples
+
+Note that, *weight* option is used to avoid repeated samples in a single off-CPU event. However, you may need all of the individual samples for certain post-processing (e.g., plotting [Flamegraph](https://github.com/brendangregg/FlameGraph)). Brendan Gregg introduces the Flamegraph and how to plot [hot/cold Flamegraph](https://www.brendangregg.com/FlameGraphs/hotcoldflamegraphs.html) based on tracing results, bperf results also can plotted as the end-to-end visualized callstack using Flamegraph. Following instructions are guide for drawing hot/cold Flamegraph with bperf.
+
+```bash
+[Record (command as example)]
+$ bperf record -g -e task-clock -c 1000000 [command]
+
+[Print individual samples]
+$ bperf script > out.perf
+
+[Post-processing samples folded format]
+$ ./stackcollapse-perf.pl out.perf > out.folded
+
+[Render a SVG]
+$ ./flamegraph.pl out.folded > hotcold.svg
+```
+
+Two scripts (stackcollapse-perf.pl and flamegraph.pl) can be obtained in [Flamegraph](https://github.com/brendangregg/FlameGraph).
 
 #### 5-3. BCOZ
 
-##### 5-3-1.
+##### 5-3-1. Add *Progress Point*
+
+Progres point is a 
+
+#### 5-4. Example application
