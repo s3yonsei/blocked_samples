@@ -77,6 +77,8 @@ After update grub, reboot your machine and make sure that newly built kernel is 
 ### 2. glibc build
 To preserve entire callchain from user to kernel, glibc is should be rebuild with 'fno-omit-frame-pointer' flag. Brief instruction of rebuild glibc library is as follows. For the more detailed instruction, please refer to [this](http://www.yl.is.s.u-tokyo.ac.jp/~tosh/kml/how_to_build_and_use_glibc.html). We verified frame pointer is preserved in glibc-2.30.
 
+**Do not use "/usr" directory as --prefix, since the original glibc will be overwritten.**
+
 ```bash
 [Download glibc-2.30]
 $ cd ~/
@@ -125,16 +127,42 @@ export PATH=[path/to/bperf]:$PATH
 ```
 
 ### 4. BCOZ build
+Instructions for building BCOZ is not different from original COZ. For the more detailed instruction, please refer to [install guide for COZ](https://github.com/plasma-umass/coz).
+
+#### 4-1. Install packages
+
+```bash
+$ apt-get update
+$ apt-get install libdwarf-dev
+$ apt-get install build-essential cmake docutils-common git python3 pkg-config
+$ apt-get install nodejs npm
+```
+
+#### 4-2. Build BCOZ
+
+```bash
+$ cd bcoz
+$ make clean && make
+$ make install
+```
+
+#### 4-3. Change 'perf_event_paranoid'
+
+```bash
+$ sudo sh -c 'echo 1 > /proc/sys/kernel/perf_event_paranoid'
+```
 
 
-## About paper
 
-For the detailed description, please refer to the paper:
+### 5. Profiling with blocked samples
 
-**Identifying On-/Off-CPU Bottlenecks Together with Blocked Samples**.
+#### 5-1. Compile application with additional flags
 
-Author: Minwoo Ahn, Jeongmin Han, Youngjin Kwon, Jinkyu Jeong.
+#### 5-2. bperf
 
-*18th USENIX Symposium on Operating Systems Design and Implementation (OSDI'24)*.
+##### 5-2-1. 
 
-Contact: Minwoo Ahn (mwahn402@gmail.com), Jinkyu Jeong (jinkyu@yonsei.ac.kr)
+#### 5-3. BCOZ
+
+##### 5-3-1.
+
