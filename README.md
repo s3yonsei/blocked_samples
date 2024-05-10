@@ -2,6 +2,15 @@
 
 [Blocked Samples](https://github.com/s3yonsei/blocked_samples) is a profiling technique based on sampling, that encompasses both on- and off-CPU events simultaneously. Based on blocked samples, we present two profiler: *bperf*, an easy-to-use sampling-based profiler and *BCOZ*, a causal profiler that profiles both on- and off-CPU events simultaneously and estimates potential speedup of optimizations.
 
+## Related paper
+
+For the detailed description, please refer to the paper:
+
+**Identifying On-/Off-CPU Bottlenecks Together with Blocked Samples**. Author: Minwoo Ahn, Jeongmin Han, Youngjin Kwon, Jinkyu Jeong. *18th USENIX Symposium on Operating Systems Design and Implementation (OSDI'24)*.
+
+Contact: Minwoo Ahn (mwahn402@gmail.com), Jinkyu Jeong (jinkyu@yonsei.ac.kr)
+
+## About this repository
 This repository consists of three subdirectories: bcoz (source code of BCOZ), blocked\_samples (source code of Linux kernel with bperf), osdi24\_ae (OSDI'24 artifacts evaluation).
 
 Description of each subdirectories are as follows.
@@ -44,7 +53,7 @@ CONFIG_UNWINDER_FRAME_POINTER=y
 
 #### 1-3. Miscelleneous
 
-Disable 'CONFIG_SYSTEM_TRUSTED_KEYS' and 'CONFIG_SYSTEM_REVOCATION_KEYS'.
+Disable 'CONFIG\_SYSTEM\_TRUSTED\_KEYS' and 'CONFIG\_SYSTEM\_REVOCATION\_KEYS'.
 
 ```bash
 $ sudo scripts/config --disable SYSTEM_TRUSTED_KEYS
