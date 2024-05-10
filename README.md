@@ -79,16 +79,18 @@ To preserve entire callchain from user to kernel, glibc is should be rebuild wit
 
 **Do not use "/usr" directory as --prefix, since the original glibc will be overwritten.**
 
+Recommended gcc version is lower or equal than 9.4.0.
+
 ```bash
 [Download glibc-2.30]
 $ cd ~/
 $ wget http://ftp.gnu.org/pub/gnu/glibc/glibc-2.30.tar.gz
 $ tar -xf glibc-2.30.tar.gz
 
-[Make build directory]
+[Make build directory (recommended gcc version<=9.4.0)]
 $ mkdir glibc-build
 $ cd glibc-build
-$ ../glibc-2.30/configure --prefix=/usr/local/lib/glibc-testing --with-tls --enable-add-ons=nptl
+$ ../glibc-2.30/configure --prefix=/usr/local/lib/glibc-testing --with-tls --enable-add-ons=nptl --enable-cet CFLAGS='-g -gdwarf-4 -fno-omit-frame-pointer' CXXFLAGS='-g -gdwarf-4 -fno-omit-frame-pointer' CPPFLAGS='-g -gdwarf4 -fno-omit-frame-pointer'
 
 [make and install]
 $ make
@@ -100,7 +102,6 @@ $ cd /trusted/local/lib/glibc-testing/lib
 $ cp /usr/local/lib/glibc-testing/lib/ld-2.30.so ./
 $ ln -s ld-2.30.so ld-linux.so.2
 ```
-
 
 
 ### 3. bperf build
@@ -125,6 +126,21 @@ $ mv perf bperf
 ```bash
 export PATH=[path/to/bperf]:$PATH
 ```
+
+#### 3-4. Simple test for bperf
+
+```bash
+$ bperf record -g -e task-clock -c 1000000 --weight sleep 5
+[ perf record: Captured and wrote x MB perf.data (5000 samples) ]
+
+$ perf record -g -e task-clock -c 1000000 sleep 5
+[ perf record: Captured and wrote x MB perf.data (1 samples) ]
+```
+
+This command records task-clock event and the sample is recorded every 1M events. Note that, the task-clock event is counted every 1ns, which means 1M events indicates that the sampling period is 1ms.
+
+If the number of the recorded samples after record is nearly **5000**, blockes samples is correctly imported with bperf (5000 samples indicates 5 sec). Please compare the results with perf.
+
 
 ### 4. BCOZ build
 Instructions for building BCOZ is not different from original COZ. For the more detailed instruction, please refer to [install guide for COZ](https://github.com/plasma-umass/coz).
@@ -152,11 +168,35 @@ $ make install
 $ sudo sh -c 'echo 1 > /proc/sys/kernel/perf_event_paranoid'
 ```
 
-
-
 ### 5. Profiling with blocked samples
 
 #### 5-1. Compile application with additional flags
+
+To profile the application with bperf and BCOZ, additional compile flags are needed. Following flags are needed to compile application and libraries that loaded dynamically. However, it is hard to compile all loaded libraries. Note that, 
+
+##### 5-1-1. Debug information
+
+```bash
+CFLAGS+='-g -gdwarf-4'
+```
+
+Note that gdwarf-4 is needed for BCOZ (and COZ).
+
+##### 5-1-2. Preserve frame pointer
+
+```bash
+CFLAGS+='-fno-omit-frame-pointer'
+```
+
+##### 5-1-3. Compile with new glibc 
+
+```bash
+CFLAGS+='-Wl,--no-as-needed -ldl -Wl,--rpath=/usr/local/lib/glibc-testing/lib -Wl,--dynamic-linker=/trusted/local/lib/glibc-testing/lib/ld-linux.so.2
+```
+
+*rpath* and *dynamic-linker* are directories of newly built glibc and dynamic loader in part 2, respectively. If you followed instructions in part 2, you can use as written above.
+
+##### 5-1-4. How to add above flags?
 
 #### 5-2. bperf
 
@@ -165,4 +205,3 @@ $ sudo sh -c 'echo 1 > /proc/sys/kernel/perf_event_paranoid'
 #### 5-3. BCOZ
 
 ##### 5-3-1.
-
