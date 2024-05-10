@@ -11,6 +11,7 @@
 #include <signal.h>
 #include <sys/syscall.h>
 #include <unistd.h>
+#include "coz.h"
 
 #define NUM_THREAD 1
 #define FILE_SIZE 32768
@@ -74,13 +75,14 @@ void* t_function(void* arg)
 	fd = open(filename, O_WRONLY|O_CREAT, 0644);
 	if(fd == -1) printf("fd error...\n");
 
-	while(i < 50000) {
+	while(i < 10000) {
 		compute(20000);
 		
 		io_light(fd, buf);
 		io_heavy(fd, buf);
 
 		i++;
+		COZ_PROGRESS;
 	}
 	close(fd);
 	remove(filename);

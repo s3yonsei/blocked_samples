@@ -163,7 +163,13 @@ $ make clean && make
 $ make install
 ```
 
-#### 4-3. Change 'perf\_event\_paranoid'
+#### 4-3. Set environment variable
+
+```bash
+export PATH=[path/to/bcoz]:$PATH
+```
+
+#### 4-4. Change 'perf\_event\_paranoid'
 
 ```bash
 $ sudo sh -c 'echo 1 > /proc/sys/kernel/perf_event_paranoid'
@@ -216,10 +222,10 @@ $ bperf record -g -e task-clock -c 1000000 --weight --pid=[pids]
 
 ##### 5-2-3. Collect every single samples
 
-Note that, *weight* option is used to avoid repeated samples in a single off-CPU event. However, you may need all of the individual samples for certain post-processing (e.g., plotting [Flamegraph](https://github.com/brendangregg/FlameGraph)). Brendan Gregg introduces the Flamegraph and how to plot [hot/cold Flamegraph](https://www.brendangregg.com/FlameGraphs/hotcoldflamegraphs.html) based on tracing results, bperf results also can plotted as the end-to-end visualized callstack using Flamegraph. Following instructions are guide for drawing hot/cold Flamegraph with bperf.
+Note that, *weight* option is used to avoid repeated samples in a single off-CPU event (Section 3.1 in the paper). However, you may need all of the individual samples for certain post-processing (e.g., plotting [Flamegraph](https://github.com/brendangregg/FlameGraph)). Brendan Gregg introduces the Flamegraph and how to plot [hot/cold Flamegraph](https://www.brendangregg.com/FlameGraphs/hotcoldflamegraphs.html) based on tracing results, bperf results also can plotted as the end-to-end visualized callstack using Flamegraph. Following instructions are guide for drawing hot/cold Flamegraph with bperf.
 
 ```bash
-[Record (command as example)]
+[Record (command as an example)]
 $ bperf record -g -e task-clock -c 1000000 [command]
 
 [Print individual samples]
@@ -238,6 +244,70 @@ Two scripts (stackcollapse-perf.pl and flamegraph.pl) can be obtained in [Flameg
 
 ##### 5-3-1. Add *Progress Point*
 
-Progres point is a 
+The counting progress point of BCOZ (and COZ) should be inserted into repeatedly executed code line of the application.
+For example, start (or end) of the iterative loop, repeated query, etc. In our paper, we incremented the progress point counter at the arrival of the every queries in the RocksDB, and the RocksDB experiment increments the progress point counter at arrival of the every queries, and the innermost loop of the main computation loop.
+
+Counting progress point is defined in bcoz/include/coz.h. Please copy this header file into your application, and add COZ\_PROGRESS in appropriate location in the application.
+
+##### 5-3-2. Run application with BCOZ
+
+Note that, you can utilize all of the existing features of the original COZ. Furthermore, there is additional type of run in BCOZ. Typical use cases are as follows.
+
+* Default run - Run with BCOZ fully enabled. Execution is divided into unit of conducting virtual speedup called *experiment*. Multiple virtual speedup results are accumulated in a single run.
+
+* End-to-end run - Run with BCOZ to conduct a single end-to-end virtual speedup. Virtual speedup target line and the size of the speedup is randomly selected. If you want specific target and the size of the speedup, you can use fixed-line and fixed-speedup with end-to-end option.
+
+* Fixed-line run - Run with BCOZ to conduct virtual speedup with fixed target code line. Fixed-line option can be used with any other options (or default run). 
+
+* Fixed-speedup run - Run with BCOZ to conduct virtual speedup with fixed sized speedup. Fixed-speedup option can be used with any other options (or default run).
+
+* (BCOZ only) Fixed-subclass run - Run with BCOZ to conduct virtual speedup with fixed target off-CPU subclass. Fixed-offcpu-subclass option can be used with any other options (or default run), except for the fixed-line. BCOZ can measure the impact of the blocking I/O, lock-waiting, CPU scheduling, and other off-CPU events, individually.
+
+```bash
+[Default run]
+$ bcoz run [--end-to-end] [--fixed-line] <file:line> [--fixed-speedup] <speedup (0-100)> --- [command]
+
+[Fixed-subclass run]
+$ bcoz run [--end-to-end] [--fixed-speedup] <speedup (0-100)> [--blocked-scope] <subclass (I/O=i, lock-waiting=l, CPU scheduling=s, others=b> --- [command]
+```
 
 #### 5-4. Example application
+
+Here is the example profiling results of the microbenchmark in osdi24\_ae/benchmarks/simple\_test.
+
+test\_io.c is a single-threaded microbenchmark that executes integer decrement (line 78: *compute()*) and blocking I/Os (line 80: *io_light()*, and line 81: *io_heavy()*). Inside of the two I/O functions, there are invocation of the *write()* and *fsync()*. *io_heavy()* executes four times more I/Os. The main off-CPU events are blocking I/O caused by *fsync()* (line 46 in *io_light()*, and line 54 in *io_heavy()*).
+
+test\_io\_coz.c is same with test\_io.c except for the progress point in line 87.
+
+##### 5-4-1. Build
+
+We provided Makefile inside of the simple\_test. Make sure that rpath and dynamic-linker are appropriate.
+
+```bash
+$ make clean && make
+```
+
+##### 5-4-1. bperf
+
+```bash
+$ bperf record -g -e task-clock -c 1000000 --weight ./test_io
+$ mv perf.data perf_weight.data
+```
+
+After recording, you can report the perf result.
+
+```bash
+[With callchain]
+$ bperf report -i perf_weight.data
+
+[IP only]
+$ bperf report -i perf_weight.data --no-children
+```
+
+(정확한 그림 예시를 넣어야 설명 가능할듯.)
+Off-CPU events' subclass is denoted in symbol section, inside the square brackets. Dot('.') and 'k' indicate on-CPU events, user and kernel, respectively, and 'I', 'L', 'S', and 'B' indicate off-CPU events, blocking I/O, lock-waiting, CPU scheduling, and other off-CPU events, respectively. In this microbenchmark, *fsync* is differentiated in on-CPU event, blocking I/O event, and other off-CPU events. Note that, on-CPU event consists of execution from application to 
+
+##### 5-4-2. BCOZ
+
+
+##### 5-4-3. (Misc.) Flamegraph

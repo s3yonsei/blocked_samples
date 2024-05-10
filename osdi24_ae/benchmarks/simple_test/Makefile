@@ -1,11 +1,15 @@
 CC=gcc
-CFLAGS=-g -fno-omit-frame-pointer -Wl,--no-as-needed -ldl -lpthread -Wl,--rpath=/usr/local/lib/glibc-testing-2.30/lib -Wl,--dynamic-linker=/trusted/local/lib/glibc-testing-2.30/lib/ld-linux.so.2
-#CFLAGS=-g -fno-omit-frame-pointer
+CFLAGS=-g -fno-omit-frame-pointer -Wl,--no-as-needed -ldl -Wl,--rpath=/usr/local/lib/glibc-testing-temp/lib -Wl,--dynamic-linker=/trusted/local/lib/glibc-testing-temp/lib/ld-linux.so.2 -lpthread
+
 TARGET=test_io
 SRC=test_io.c
 
-test: $(SRC)
+TARGET2=test_io_coz
+SRC2=test_io_coz.c
+
+all: $(SRC)
 	$(CC) $(CFLAGS) -o $(TARGET) $(SRC)
+	$(CC) $(CFLAGS) -o $(TARGET2) $(SRC2)
 
 clean:
-	rm $(TARGET)
+	rm $(TARGET) $(TARGET2)
