@@ -10,10 +10,10 @@ For the detailed description, please refer to the paper:
 
 Contact: Minwoo Ahn (mwahn402@gmail.com), Jinkyu Jeong (jinkyu@yonsei.ac.kr)
 
-## About this repository
+## About repository
 This repository consists of three subdirectories: bcoz (source code of BCOZ), blocked\_samples (source code of Linux kernel with bperf), osdi24\_ae (OSDI'24 artifacts evaluation).
 
-Description of each subdirectories are as follows.
+Descriptions of each subdirectories are as follows.
 
 ### bcoz
 This directory includes source code of BCOZ. BCOZ is a causal profiler that leverages the concept of virtual speedup for both on-/off-CPU events using blocked samples. At its core, BCOZ utilizes on- and off-CPU evnets profiles collected by blocked samples and estimates performance improvement through virtual speedup. BCOZ is built on top of [COZ](https://github.com/plasma-umass/coz) (SOSP'15).
@@ -30,7 +30,7 @@ This directory is for OSDI'24 artifacts evaluation. It includes instructions for
 The Linux kernel version of blocked samples is 5.3.7 and may not compile on Ubuntu versions newer than Ubuntu 20.04 (Ubuntu 20.04 LTS server is recommended). We will port the blocked samples to a newer kernel in the near future.
 
 ### 1. Linux kernel build
-To enable blocked samples, you need to utilize the Linux kernel we provide.
+To enable blocked samples, you need to utilize the Linux kernel that we provided.
 The process of building the Linux kernel is as follows.
 
 #### 1-1. Install packages
@@ -66,7 +66,7 @@ $ sudo scripts/config --disable SYSTEM_REVOCATION_KEYS
 $ sudo make -j$(nproc) && sudo make modules -j$(nproc) && sudo make INSTALL_MOD_STRIP=1 modules_install -j$(nproc) && sudo make install -j$(nproc)
 ```
 
-#### grub update and reboot
+#### 1-5. grub update and reboot
 
 ```bash
 $ sudo update-grub
@@ -79,7 +79,7 @@ To preserve entire callchain from user to kernel, glibc is should be rebuild wit
 
 **Do not use "/usr" directory as --prefix, since the original glibc will be overwritten.**
 
-Recommended gcc version is lower or equal than 9.4.0.
+Recommended gcc version is lower or equal than 9.4.0 (we verified on 9.4.0).
 
 ```bash
 [Download glibc-2.30]
@@ -131,19 +131,20 @@ export PATH=[path/to/bperf]:$PATH
 
 ```bash
 $ bperf record -g -e task-clock -c 1000000 --weight sleep 5
+...
 [ perf record: Captured and wrote x MB perf.data (5000 samples) ]
 
 $ perf record -g -e task-clock -c 1000000 sleep 5
+...
 [ perf record: Captured and wrote x MB perf.data (1 samples) ]
 ```
 
 This command records task-clock event and the sample is recorded every 1M events. Note that, the task-clock event is counted every 1ns, which means 1M events indicates that the sampling period is 1ms.
-
 If the number of the recorded samples after record is nearly **5000**, blockes samples is correctly imported with bperf (5000 samples indicates 5 sec). Please compare the results with perf.
 
 
 ### 4. BCOZ build
-Instructions for building BCOZ is not different from original COZ. For the more detailed instruction, please refer to [install guide for COZ](https://github.com/plasma-umass/coz).
+Instructions for building BCOZ is not much different from original COZ. For the more detailed instruction, please refer to [install guide for COZ](https://github.com/plasma-umass/coz).
 
 #### 4-1. Install packages
 
@@ -162,7 +163,7 @@ $ make clean && make
 $ make install
 ```
 
-#### 4-3. Change 'perf_event_paranoid'
+#### 4-3. Change 'perf\_event\_paranoid'
 
 ```bash
 $ sudo sh -c 'echo 1 > /proc/sys/kernel/perf_event_paranoid'
@@ -172,29 +173,15 @@ $ sudo sh -c 'echo 1 > /proc/sys/kernel/perf_event_paranoid'
 
 #### 5-1. Compile application with additional flags
 
-To profile the application with bperf and BCOZ, additional compile flags are needed. Following flags are needed to compile application and libraries that loaded dynamically. However, it is hard to compile all loaded libraries. Note that, 
-
-##### 5-1-1. Debug information
+To profile the application with bperf and BCOZ, additional compile flags are needed. Following flags are needed to compile application and libraries that loaded dynamically. However, it is hard to compile all loaded libraries. Note that, to take full advantage of BCOZ (and COZ), libraries belonging to symbols in frequently sampled callchains must be compiled with the following flags. Otherwise, the results of virtual speedup will no be meaningful, or the predicted results will be inaccurate.
 
 ```bash
-CFLAGS+='-g -gdwarf-4'
+CFLAGS+='-g -gdwarf-4 -fno-omit-frame-pointer -Wl,--no-as-needed -ldl -Wl,--rpath=/usr/local/lib/glibc-testing/lib -Wl,--dynamic-linker=/trusted/local/lib/glibc-testing/lib/ld-linux.so.2'
 ```
 
-Note that gdwarf-4 is needed for BCOZ (and COZ).
-
-##### 5-1-2. Preserve frame pointer
-
-```bash
-CFLAGS+='-fno-omit-frame-pointer'
-```
-
-##### 5-1-3. Compile with new glibc 
-
-```bash
-CFLAGS+='-Wl,--no-as-needed -ldl -Wl,--rpath=/usr/local/lib/glibc-testing/lib -Wl,--dynamic-linker=/trusted/local/lib/glibc-testing/lib/ld-linux.so.2
-```
-
-*rpath* and *dynamic-linker* are directories of newly built glibc and dynamic loader in part 2, respectively. If you followed instructions in part 2, you can use as written above.
+* '-g -gdwarf-4' is for debug information. Especially, gdwarf-4 is needed for BCOZ (and COZ).
+* '-fno-omit-frame-pointer' is for preserve frame pointer.
+* '-Wl,--no-as-needed -ldl -Wl,--rpath=/usr/local/lib/glibc-testing/lib' is for use newly built glibc library. *rpath* and *dynamic-linker* are directories of newly built glibc and dynamic loader in [glibc build](#2-glibc-build), respectively. If you followed instructions in part 2, you can use as written above.
 
 ##### 5-1-4. How to add above flags?
 
