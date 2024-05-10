@@ -1,0 +1,244 @@
+#!/usr/bin/env python3
+
+# Copyright (c) 2019, Charlie Curtsinger and Emery Berger,
+#                     University of Massachusetts Amherst
+# This file is part of the Coz project. See LICENSE.md file at the top-level
+# directory of this distribution and at http://github.com/plasma-umass/coz.
+
+import argparse
+import copy
+import os
+import subprocess
+import sys
+
+from os.path import abspath, realpath, curdir, dirname, sep as path_sep
+
+# Entry point
+def run_command_line():
+  # By default, parse all arguments
+  parsed_args = sys.argv[1:]
+  remaining_args = []
+  # If there is a '---' separator, only parse arguments before the separator
+  if '---' in sys.argv:
+    separator_index = sys.argv.index('---')
+    parsed_args = sys.argv[1:separator_index]
+    remaining_args = sys.argv[separator_index+1:]
+  # Pass the un-parsed arguments to the parser result
+  _parser.set_defaults(remaining_args=remaining_args)
+  # Parse it
+  args = _parser.parse_args(parsed_args)
+  if not hasattr(args, 'func'):
+    sys.stderr.write('error: pass a command before ---, such as `coz run --- $CMD`\n')
+    _parser.print_help()
+    sys.exit(1)
+
+  # Call the parser's handler (set by the subcommand parser using defaults)
+  args.func(args)
+
+# Handler for the `coz run` subcommand
+def _coz_run(args):
+  # Ensure the user specified a command after the '---' separator
+  if len(args.remaining_args) == 0:
+    sys.stderr.write('error: specify a command to profile after `---`\n')
+    args.parser.print_help()
+    sys.exit(1)
+
+  env = copy.deepcopy(os.environ)
+
+  # Find coz
+  coz_prefix = dirname(realpath(sys.argv[0]))
+  sys.stderr.write(coz_prefix + '\n')
+
+  # Candidate runtime library locations
+  library_locations = [
+    # Check for library adjacent to this script
+    os.path.join(coz_prefix, '..', 'lib64', 'libcoz.so'),
+    os.path.join(coz_prefix, '..', 'lib', 'libcoz.so'),
+
+    # Check for library under the coz-profiler subdirectory
+    os.path.join(coz_prefix, '..', 'lib64', 'coz-profiler', 'libcoz.so'),
+    os.path.join(coz_prefix, '..', 'lib', 'coz-profiler', 'libcoz.so'),
+
+    # Local library under development directory
+    os.path.join('libcoz', 'libcoz.so'),      # Local library during development
+    os.path.join(coz_prefix, 'libcoz', 'libcoz.so'),
+    os.path.join(coz_prefix, 'build', 'libcoz', 'libcoz.so'),
+  ]
+
+  # Find the first library location that exists
+  coz_runtime_found = False
+  coz_runtime = None
+
+  sys.stderr.write(library_locations[0] + '\n' + library_locations[1] + '\n' + library_locations[2] + '\n' + library_locations[3] + '\n' + library_locations[4] + '\n' + library_locations[5] + '\n' + library_locations[6] + '\n')
+
+  while len(library_locations) > 0 and not coz_runtime_found:
+    candidate = library_locations.pop(0)
+    if os.path.exists(candidate):
+      coz_runtime_found = True
+      coz_runtime = candidate
+
+  if not coz_runtime_found:
+    sys.stderr.write('error: unable to locate coz runtime library\n')
+    sys.exit(1)
+
+  if 'LD_PRELOAD' in env:
+    env['LD_PRELOAD'] += ':' + coz_runtime
+    ##env['LD_PRELOAD'] = coz_runtime + ':' + env['LD_PRELOAD']
+  else:
+    env['LD_PRELOAD'] = coz_runtime
+
+  if len(args.binary_scope) > 0:
+    env['COZ_BINARY_SCOPE'] = '\t'.join(args.binary_scope)
+  else:
+    env['COZ_BINARY_SCOPE'] = 'MAIN'
+
+  if len(args.source_scope) > 0:
+    env['COZ_SOURCE_SCOPE'] = '\t'.join(args.source_scope)
+  else:
+    env['COZ_SOURCE_SCOPE'] = '%'
+
+  env['COZ_PROGRESS_POINTS'] = '\t'.join(args.progress)
+
+  env['COZ_OUTPUT'] = args.output
+
+  if args.end_to_end:
+    env['COZ_END_TO_END'] = '1'
+
+  if args.fixed_line:
+    env['COZ_FIXED_LINE'] = args.fixed_line
+
+  if args.based_line:
+    env['COZ_BASED_LINE'] = args.based_line
+  
+  if args.based_blocked:
+    env['COZ_BASED_BLOCKED'] = str(args.based_blocked)
+
+  if args.based_speedup != None:
+    env['COZ_BASED_SPEEDUP'] = str(args.based_speedup)
+
+  if args.fixed_speedup != None:
+    env['COZ_FIXED_SPEEDUP'] = str(args.fixed_speedup)
+
+  if args.blocked_scope != None:
+    env['COZ_BLOCKED_SCOPE'] = str(args.blocked_scope)
+
+  if args.print_log:
+    env['COZ_PRINT_LOG'] = '1'
+
+  try:
+    sys.stderr.write(args.remaining_args[0]+'\n')
+    sys.stderr.write(env['LD_PRELOAD']+'\n')
+
+    result = subprocess.call(args.remaining_args, env=env)
+  except KeyboardInterrupt:
+    # Exit with special control-C return code
+    result = 130
+    # Add a newline to mimic output when running without coz
+    print()
+  exit(result)
+
+def open_browser(url):
+  import webbrowser
+  webbrowser.open_new_tab(url)
+  
+def _coz_plot(args):
+  coz_plot_url = 'http://plasma-umass.github.io/coz'
+  import threading
+  t1 = threading.Thread(target=open_browser,args=(coz_plot_url,))
+  t1.start()
+  #if sys.platform == 'darwin':
+  #  subprocess.call(['open', coz_plot_url])
+  #elif sys.platform == 'win32':
+  #  os.startfile(coz_plot_url)
+  #else:
+  #  subprocess.call(['xdg-open', coz_plot_url])
+  
+
+# Special format handler for line reference arguments
+def line_ref(val):
+  try:
+    (filename, line) = val.rsplit(':', 1)
+    line = int(line)
+    return filename + ':' + str(line)
+  except:
+    msg = "Invalid line reference %r. The format is <source file>:<line number>." % val
+    raise argparse.ArgumentTypeError(msg)
+
+######### Build the top-level parser #########
+_parser = argparse.ArgumentParser()
+_subparsers = _parser.add_subparsers()
+
+######### Build the parser for the `run` sub-command #########
+_run_parser = _subparsers.add_parser('run',
+                                     usage='%(prog)s [profiling options] --- <command> [args]',
+                                     help='Run a program with coz to collect a causal profile.')
+
+# Add common profiler options
+_run_parser.add_argument('--binary-scope', '-b',
+                         metavar='<file pattern>',
+                         default=[], action='append',
+                         help='Profile matching executables. Use \'%%\' as a wildcard, or \'MAIN\' to include the main executable (default=MAIN)')
+
+_run_parser.add_argument('--source-scope', '-s',
+                         metavar='<file pattern>',
+                         default=[], action='append',
+                         help='Profile matching source files. Use \'%%\' as a wildcard. (default=%%)')
+
+_run_parser.add_argument('--progress', '-p',
+                         metavar='<source file>:<line number>',
+                         type=line_ref, action='append', default=[],
+                         help='[NOT SUPPORTED] Add a sampling-based progress point')
+
+_run_parser.add_argument('--output', '-o',
+                         metavar='<profile output>',
+                         default=abspath(curdir+path_sep+'profile.coz'),
+                         help='Profiler output (default=`profile.coz`)')
+
+_run_parser.add_argument('--end-to-end',
+                         action='store_true', default=False,
+                         help='Run a single performance experiment per-execution')
+
+_run_parser.add_argument('--fixed-line',
+                         metavar='<source file>:<line number>', default=None,
+                         help='Evaluate optimizations of a specific source line')
+
+_run_parser.add_argument('--based-line',
+                         metavar='<source file>:<line number>', default=None,
+                         help='Base event of relational profiling')
+
+_run_parser.add_argument('--based-blocked',
+                         metavar='<subclass> (Off-CPU=a, non-defined off-CPU(as sleep)=b, I/O=i, lock-waiting=l, scheduling=s)',
+                         choices=['b', 'i', 'l', 's', 'a'], default=None,
+                         help='Profile matching base event off-CPU subclass.')
+
+_run_parser.add_argument('--based-speedup',
+                         metavar='<speedup> (0-100)',
+                         type=int, choices=list(range(0, 101)), default=None,
+                         help='Speedup of base event')
+
+_run_parser.add_argument('--fixed-speedup',
+                         metavar='<speedup> (0-100)',
+                         type=int, choices=list(range(0, 101)), default=None,
+                         help='Evaluate optimizations of a specific amount')
+
+_run_parser.add_argument('--blocked-scope',
+                         metavar='<subclass> (On-CPU=o, off-CPU=a, non-defined off-CPU(as sleep)=b, I/O=i, lock-waiting=l, scheduling=s)',
+                         choices=['o', 'b', 'i', 'l', 's', 'a'], default=None,
+                         help='Profile matching off-CPU subclass.')
+
+_run_parser.add_argument('--print-log',
+                         action='store_true', default=False,
+                         help='Print the log of profiler thread and each wrapped threads')
+
+# Use defaults to recover handler function and parser object from parser output
+_run_parser.set_defaults(func=_coz_run, parser=_run_parser)
+
+######### Build the parser for the `coz plot` subcommand
+_plot_parser = _subparsers.add_parser('plot',
+                                      help='Plot the speedup results from one or more causal profiling runs.')
+
+# Use defaults to recover handler function and parser object from parser output
+_plot_parser.set_defaults(func=_coz_plot, parser=_plot_parser)
+
+if __name__ == "__main__":
+  run_command_line()

@@ -1,0 +1,43 @@
+# Build on Ubuntu 18.04
+dist: bionic
+
+# Specify language
+language: cpp
+
+# Build with both clang and gcc
+compiler:
+  - clang
+  - g++
+
+# Build all branches except gh-pages
+branches:
+  except:
+    - gh-pages
+
+# Install dependencies
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install -y --install-recommends build-essential cmake ninja-build docutils-common nodejs npm
+  - sudo pip install conan
+
+# Make and install
+install:
+  - mkdir build && cd build
+  - conan install .. -s compiler.libcxx=libstdc++11 -s compiler.cppstd=11 --build=outdated
+  - cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_BENCHMARKS=ON -G Ninja
+  - ninja
+  - sudo ninja install
+
+# Run tests
+script:
+  - CTEST_OUTPUT_ON_FAILURE=1 ninja test
+
+# Test the Rust support as well
+matrix:
+  include:
+    - language: rust
+      rust: stable
+      before_install: true
+      install: true
+      script: cargo test --manifest-path rust/Cargo.toml
+
