@@ -6,7 +6,9 @@
 
 For the detailed description, please refer to the paper:
 
-**Identifying On-/Off-CPU Bottlenecks Together with Blocked Samples**. Author: Minwoo Ahn, Jeongmin Han, Youngjin Kwon, Jinkyu Jeong. *18th USENIX Symposium on Operating Systems Design and Implementation (OSDI'24)*.
+**Identifying On-/Off-CPU Bottlenecks Together with Blocked Samples**.
+
+Author: Minwoo Ahn, Jeongmin Han, Youngjin Kwon, Jinkyu Jeong. *18th USENIX Symposium on Operating Systems Design and Implementation (OSDI'24)*.
 
 Contact: Minwoo Ahn (mwahn402@gmail.com), Jinkyu Jeong (jinkyu@yonsei.ac.kr)
 

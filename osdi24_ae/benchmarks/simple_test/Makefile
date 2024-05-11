@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-g -fno-omit-frame-pointer -Wl,--no-as-needed -ldl -Wl,--rpath=/usr/local/lib/glibc-testing/lib -Wl,--dynamic-linker=/trusted/local/lib/glibc-testing/lib/ld-linux.so.2 -lpthread
+CFLAGS=-g -gdwarf-4 -fno-omit-frame-pointer -Wl,--no-as-needed -ldl -Wl,--rpath=/usr/local/lib/glibc-testing/lib -Wl,--dynamic-linker=/trusted/local/lib/glibc-testing/lib/ld-linux.so.2 -lpthread
 
 TARGET=test_io
 SRC=test_io.c
