@@ -253,15 +253,15 @@ Counting progress point is defined in bcoz/include/coz.h. Please copy this heade
 
 Note that, you can utilize all of the existing features of the original COZ. Furthermore, there is additional type of run in BCOZ. Typical use cases are as follows.
 
-* Default run - Run with BCOZ fully enabled. Execution is divided into unit of conducting virtual speedup called *experiment*. Multiple virtual speedup results are accumulated in a single run.
+* Default - Run with BCOZ fully enabled. Execution is divided into unit of conducting virtual speedup called *experiment*. Multiple virtual speedup results are accumulated in a single run.
 
-* End-to-end run - Run with BCOZ to conduct a single end-to-end virtual speedup. Virtual speedup target line and the size of the speedup is randomly selected. If you want specific target and the size of the speedup, you can use fixed-line and fixed-speedup with end-to-end option.
+* End-to-end - Run with BCOZ to conduct a single end-to-end virtual speedup. Virtual speedup target line and the size of the speedup is randomly selected. If you want specific target and the size of the speedup, you can use fixed-line and fixed-speedup with end-to-end option.
 
-* Fixed-line run - Run with BCOZ to conduct virtual speedup with fixed target code line. Fixed-line option can be used with any other options (or default run). 
+* Fixed-line - Run with BCOZ to conduct virtual speedup with fixed target code line. Fixed-line option can be used with any other options (or default run). 
 
-* Fixed-speedup run - Run with BCOZ to conduct virtual speedup with fixed sized speedup. Fixed-speedup option can be used with any other options (or default run).
+* Fixed-speedup - Run with BCOZ to conduct virtual speedup with fixed sized speedup. Fixed-speedup option can be used with any other options (or default run).
 
-* (BCOZ only) Fixed-subclass run - Run with BCOZ to conduct virtual speedup with fixed target off-CPU subclass. Fixed-offcpu-subclass option can be used with any other options (or default run), except for the fixed-line. BCOZ can measure the impact of the blocking I/O, lock-waiting, CPU scheduling, and other off-CPU events, individually.
+* (BCOZ only) Fixed-subclass - Run with BCOZ to conduct virtual speedup with fixed target off-CPU subclass. Fixed-offcpu-subclass option can be used with any other options (or default run), except for the fixed-line. BCOZ can measure the impact of the blocking I/O, lock-waiting, CPU scheduling, and other off-CPU events, individually.
 
 ```bash
 [Default run]
@@ -308,6 +308,19 @@ $ bperf report -i perf_weight.data --no-children
 Off-CPU events' subclass is denoted in symbol section, inside the square brackets. Dot('.') and 'k' indicate on-CPU events, user and kernel, respectively, and 'I', 'L', 'S', and 'B' indicate off-CPU events, blocking I/O, lock-waiting, CPU scheduling, and other off-CPU events, respectively. In this microbenchmark, *fsync* is differentiated in on-CPU event, blocking I/O event, and other off-CPU events. Note that, on-CPU event consists of execution from application to 
 
 ##### 5-4-2. BCOZ
+
+```bash
+[Default run]
+$ bcoz run --- ./test_io_coz
+
+[Fixed-subclass (I/O)]
+$ bcoz run --blocked-scope i --- ./test_io_coz
+
+[Fixed-line run]
+$ bcoz run --fixed-line test_io_coz.c:55 --- ./test_io_coz
+```
+
+Load the generated profile.coz file into [plotter of COZ](https://plasma-umass.org/coz/).
 
 
 ##### 5-4-3. (Misc.) Flamegraph
