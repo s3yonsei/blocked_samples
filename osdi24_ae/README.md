@@ -226,4 +226,6 @@ To compare the virtual speedup results with actual speedup (Figure 15c), try to 
 
 ## 6. Conclusion
 
-To conclude, 
+To conclude, our paper introduces a sampling technique called blocked samples, which enables the identification of application bottlenecks by integrating on- and off-CPU events within the same dimension. We present bperf, a Linux perf tool that utilizes the proposed blocked samples technique to identify application bottlenecks based on event execution time, and BCOZ, a causal profiler that offers a virtual speedup for both on-/off-CPU events.
+
+We validated our proposal with the above experiments. We hope that our blocked samples technique, as well as bperf and BCOZ, will help you identify bottlenecks in your application!

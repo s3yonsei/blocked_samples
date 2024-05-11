@@ -2,9 +2,10 @@
 
 [Blocked Samples](https://github.com/s3yonsei/blocked_samples) is a profiling technique based on sampling, that encompasses both on- and off-CPU events simultaneously.
 
-aa
+To utilize blocked samples, extended Linux perf subsystem is needed. Furthermore, bperf is included in this directory (tools/perf).
 
-aa
+Please follow the instructions in [Getting Started with Blocked Samples](https://github.com/s3yonsei/blocked_samples/tree/main?tab=readme-ov-file#getting-started-with-blocked-samples) to use blocked samples and bperf.
+
 
 For the detailed description, please refer to the paper:
 
