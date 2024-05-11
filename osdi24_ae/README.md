@@ -76,7 +76,7 @@ $ cd motivational
 $ make clean && make
 ```
 
-Four binary files (test\_motivational\_case1, test\_motivational\_case2, test\_motivational\_case1_coz, test\_motivational\_case2_coz) are generated after make. The two binaries without '\_coz' can be run directly (i.e., ./test\_motivational\_case1), and you should verify that each behaves the same as in Figure 1 in the paper. We've added print some text before the two threads enter *barrier()*. When running test\_motivational\_case1, thread 1's print should come first in every iteration, and vice versa when running test\_motivational\_case2. 
+Four binary files (test\_motivational\_case1, test\_motivational\_case2, test\_motivational\_case1\_coz, test\_motivational\_case2\_coz) are generated after make. The two binaries without '\_coz' can be run directly (i.e., ./test\_motivational\_case1), and you should verify that each behaves the same as in Figure 1 in the paper. We've added print some text before the two threads enter *barrier()*. When running test\_motivational\_case1, thread 1's print should come first in every iteration, and vice versa when running test\_motivational\_case2. 
 
 ```bash
 [test_motivational_test1]
@@ -124,6 +124,26 @@ $ bperf report -i perf_t2.data --no-children
 ```
 
 Although the reported results and the Figure 7 may differ in details, the off-CPU events corresponding to blocking I/O (**I** in the square brackets) for `__libc_pread64`, `__libc_pwrite`, and lock-waiting (**L** in the square brackets) for `pthread_cond_wait` should be reported.
+
+**Note**: The sampling results of original Linux perf (Figure 2) can be obtained with same recording commands above, except for the name of the tool (bperf->perf). However, for a proper comparison with bperf's sampling results with bperf's, recording should be done after booting into a original Linux kernel rather than the Linux kernel for blocked samples.
+
+#### 5-1-3. BCOZ
+
+Figure 9 is obtained by run BCOZ. We recommend that you run the application repeatedly to accumulate many virtual speedup results for accuracy.
+
+```bash
+[Case 1]
+$ for((i=0;i<5;i++)); do sync; echo 3 > /proc/sys/vm/drop_caches; sleep 2; bcoz run --- ./test_motivational_case1_coz; done
+$ for((i=0;i<5;i++)); do sync; echo 3 > /proc/sys/vm/drop-caches; sleep 2; bcoz run --blocked-scope i --- ./test_motivational_case1_coz; done
+$ mv profile.coz profile_case1.coz
+
+[Case 2]
+$ for((i=0;i<5;i++)); do sync; echo 3 > /proc/sys/vm/drop_caches; sleep 2; bcoz run --- ./test_motivational_case2_coz; done
+$ for((i=0;i<5;i++)); do sync; echo 3 > /proc/sys/vm/drop-caches; sleep 2; bcoz run --blocked-scope i --- ./test_motivational_case2_coz; done
+$ mv profile.coz profile_case2.coz
+```
+
+Load the generated `.coz` files into [plot](https://plasma-umass.org/coz/).
 
 ### 5-2. RocksDB-*prefix\_dist*
 
