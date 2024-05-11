@@ -4,8 +4,8 @@ CFLAGS=-g -gdwarf-4 -fno-omit-frame-pointer -Wl,--no-as-needed -ldl -Wl,--rpath=
 TARGET=test_io
 SRC=test_io.c
 
-TARGET2=test_io_coz
-SRC2=test_io_coz.c
+TARGET2=test_io_bcoz
+SRC2=test_io_bcoz.c
 
 all: $(SRC)
 	$(CC) $(CFLAGS) -o $(TARGET) $(SRC)

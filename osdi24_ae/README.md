@@ -72,11 +72,11 @@ $ mount -t ext4 /dev/nvme1n1p1 /media/nvme_fast
 #### 5-1-1. Build
 
 ```bash
-$ cd motivational
+$ cd benchmarks/motivational
 $ make clean && make
 ```
 
-Four binary files (test\_motivational\_case1, test\_motivational\_case2, test\_motivational\_case1\_coz, test\_motivational\_case2\_coz) are generated after make. The two binaries without '\_coz' can be run directly (i.e., ./test\_motivational\_case1), and you should verify that each behaves the same as in Figure 1 in the paper. We've added print some text before the two threads enter *barrier()*. When running test\_motivational\_case1, thread 1's print should come first in every iteration, and vice versa when running test\_motivational\_case2. 
+Four binary files (test\_motivational\_case1, test\_motivational\_case2, test\_motivational\_case1_bcoz, test\_motivational\_case2_bcoz) are generated after make. The two binaries without '\_coz' can be run directly (i.e., ./test\_motivational\_case1), and you should verify that each behaves the same as in Figure 1 in the paper. We've added print some text before the two threads enter *barrier()*. When running test\_motivational\_case1, thread 1's print should come first in every iteration, and vice versa when running test\_motivational\_case2. 
 
 ```bash
 [test_motivational_test1]
@@ -133,27 +133,62 @@ Figure 9 is obtained by run BCOZ. We recommend that you run the application repe
 
 ```bash
 [Case 1]
-$ for((i=0;i<5;i++)); do sync; echo 3 > /proc/sys/vm/drop_caches; sleep 2; bcoz run --- ./test_motivational_case1_coz; done
-$ for((i=0;i<5;i++)); do sync; echo 3 > /proc/sys/vm/drop-caches; sleep 2; bcoz run --blocked-scope i --- ./test_motivational_case1_coz; done
+$ for((i=0;i<5;i++)); do sync; echo 3 > /proc/sys/vm/drop_caches; sleep 2; bcoz run --- ./test_motivational_case1_bcoz; done
+$ for((i=0;i<5;i++)); do sync; echo 3 > /proc/sys/vm/drop-caches; sleep 2; bcoz run --blocked-scope i --- ./test_motivational_case1_bcoz; done
 $ mv profile.coz profile_case1.coz
 
 [Case 2]
-$ for((i=0;i<5;i++)); do sync; echo 3 > /proc/sys/vm/drop_caches; sleep 2; bcoz run --- ./test_motivational_case2_coz; done
-$ for((i=0;i<5;i++)); do sync; echo 3 > /proc/sys/vm/drop-caches; sleep 2; bcoz run --blocked-scope i --- ./test_motivational_case2_coz; done
+$ for((i=0;i<5;i++)); do sync; echo 3 > /proc/sys/vm/drop_caches; sleep 2; bcoz run --- ./test_motivational_case2_bcoz; done
+$ for((i=0;i<5;i++)); do sync; echo 3 > /proc/sys/vm/drop-caches; sleep 2; bcoz run --blocked-scope i --- ./test_motivational_case2_bcoz; done
 $ mv profile.coz profile_case2.coz
 ```
 
 Load the generated `.coz` files into [plot](https://plasma-umass.org/coz/).
 
-### 5-2. RocksDB-*prefix\_dist*
+### 5-2. RocksDB
 
-### 5-3. RocksDB-*allrandom*
+#### 5-2-1. Build
 
-### 5-4. RocksDB-*fillrandom*
+#### 5-2-2. RocksDB-*prefix\_dist*
 
-### 5-5. NPB-*integer sort*
+#### 5-2-3. RocksDB-*allrandom*
 
-### 5-6. Overhead
+#### 5-2-4. RocksDB-*fillrandom*
+
+### 5-3. NPB-*integer sort*
+
+#### 5-3-1. Build
+
+```
+$ cd benchmarks/NPB
+
+[Binary for measuring performance without BCOZ]
+$ cp IS/is_bak.c IS/is.c
+$ make clean && make is CLASS=C
+$ cd bin; mv is.C.x is.C.x_perf; cd ..
+
+[Binary for BCOZ]
+$ cp IS/is_bcoz.c IS/is.c
+$ make clean && make is CLASS=C
+$ cd bin; mv is.C.x is.C.x_bcoz; cd ..
+```
+
+#### 5-3-2. BCOZ
+
+```
+[Run IS with 32 openmp threads]
+$ export OMP_NUM_THREADS=32
+
+[Run IS with BCOZ (default run)]
+$ for((i=0;i<5;i++)); do sleep 2; taskset -c 0 bcoz run --- ./bin/is.C.x_bcoz; done
+
+[Run IS with BCOZ (specifying offcpu subclass)]
+$ for((i=0;i<5;i++)); do sleep 2; taskset -c 0 bcoz run --blocked-scope s --- ./bin/is.C.x_bcoz; done
+```
+
+Load the generated '.coz' file into [plot](https://plasma-umass.org/coz/).
+
+### 5-4. Overhead
 
 ## 6. Conclusion
 
