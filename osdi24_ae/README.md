@@ -31,18 +31,20 @@ We recommend that follow the instructions below after you complete the [Getting 
 
 ## 2. Artifacts components
 
-Blocked samples is consists of two main components: Linux perf subsystem (Linux kernel), and BCOZ source codes (bperf is included in Linux kernel). Both are maintained in *bcoz* and *blocked\_samples* directories in this repository, respectively (https://github.com/s3yonsei/blocked_samples).
+Blocked samples is consists of two main components: Linux perf subsystem (Linux kernel), and BCOZ source codes (bperf is included in Linux kernel). Both are maintained in *bcoz* and *blocked\_samples* directories in this repository, respectively (https://github.com/s3yonsei/blocked\_samples).
 
 ## 3. Configurations
 
 | **Component** | **Specification**                  |
 |---------------|------------------------------------|
 | Processor     | Intel Xeon Gold 5218 2.30 GHz * 2, 32 physical cores |
-| **SSD**       | |
+| **SSD**       | Samsung NVMe PM983 (540K IOPS) and PM1735 (1,500K IOPS)|
 | Memory        | DDR4 2933 MHz, 384 GB (32 GB x 12)  |
 | **OS**        | Ubuntu 20.04 Server |
 
-Note that, to evaluate our artifacts, not all system configurations are mendatory. However,
+Note that, to evaluate our artifacts, not all system configurations are mendatory. However, the performance of the SSD used in the RocksDB experiment can affect the profiling results. For example, the *prefix\_dist* experiment shows profiling results that emphasize the importance of optimizing block cache lock contention over optimizing I/O events in read-only workloads, but this can be reversed if the SSD used is slow.
+
+This is the biggest concern for artifacts evaluation, but we have specified the SSDs we used for each experiment and recommend utilizing NVMe SSDs that are as close to the performance as possible. If this is not possible, we recommend utilizing two NVMe SSDs with different performance.
 
 
 ## 4. Getting Started Instructions
@@ -52,3 +54,4 @@ Please follow the instructions in [Getting Started with Blocked Samples](https:/
 
 ## 6. Conclusion
 
+To conclude, 
