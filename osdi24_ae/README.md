@@ -160,10 +160,21 @@ $ make libsnappy.a DEBUG_LEVEL=2 -j
 $ make libzstd.a DEBUG_LEVEL=2 -j
 $ make libz.a DEBUG_LEVEL=2 -j
 $ make liblz4.a DEBUG_LEVEL=2 -j
-$ make lib
+
+[Make db_bench for baseline execution]
+$ make db_bench DEBUG_LEVEL=2 -j
+$ mv db_bench db_bench_perf
+
+[Make db_bench for BCOZ]
+$ make db_bench DEBUG_LEVEL=2 -j
+$ mv db_bench db_bench_bcoz
 ```
 
+**Note**: Built static libraries are removed with `$ make clean`. Please backup these libraries and copy at making db\_bench. We modified Makefile to add compile flags needed for generating debug information and preserving frame pointers, as well as linking static libraries.
+
 #### 5-2-2. RocksDB-*prefix\_dist*
+
+
 
 #### 5-2-3. RocksDB-*allrandom*
 
