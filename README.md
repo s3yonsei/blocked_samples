@@ -2,7 +2,7 @@
 
 [Blocked Samples](https://github.com/s3yonsei/blocked_samples) is a profiling technique based on sampling, that encompasses both on- and off-CPU events simultaneously. Based on blocked samples, we present two profiler: *bperf*, an easy-to-use sampling-based profiler and *BCOZ*, a causal profiler that profiles both on- and off-CPU events simultaneously and estimates potential speedup of optimizations.
 
-## Related paper
+## Related Paper
 
 For the detailed description, please refer to the paper:
 
@@ -10,7 +10,7 @@ For the detailed description, please refer to the paper:
 
 Contact: Minwoo Ahn (mwahn402@gmail.com), Jinkyu Jeong (jinkyu@yonsei.ac.kr)
 
-## About repository
+## About Repository
 This repository consists of three subdirectories: bcoz (source code of BCOZ), blocked\_samples (source code of Linux kernel with bperf), osdi24\_ae (OSDI'24 artifacts evaluation).
 
 Descriptions of each subdirectories are as follows.
@@ -24,7 +24,7 @@ This directory includes extended Linux perf subsystem for blocked samples. Block
 ### osdi24\_ae
 This directory is for OSDI'24 artifacts evaluation. It includes instructions for reproducing experimental results in the paper.
 
-## Quick start guide
+## Getting Started with Blocked Samples
 
 ### 0. Ubuntu version
 The Linux kernel version of blocked samples is 5.3.7 and may not compile on Ubuntu versions newer than Ubuntu 20.04 (Ubuntu 20.04 LTS server is recommended). We will port the blocked samples to a newer kernel in the near future.
@@ -335,3 +335,22 @@ Off-CPU events' subclass is denoted in symbol section, inside the square bracket
 <img src="https://github.com/s3yonsei/blocked_samples/blob/main/osdi24_ae/benchmarks/simple_test/example_results/example-bcoz.PNG " width="90%">
 
 BCOZ shows virtual speedup results results for lines of application code that contain off-CPU events. The first figure shows the performance improvement estimates for improving blocking I/O only (fixed-subclass run), and the next two figures show the performance improvement estimates for improving *fsync()* calls contained in *io\_heavy()* and *io\_light()*, respectively. Note that, the behavior of *fsync()* shows higher virtual speedup results because it inclues on-CPU events from the application-level to the kernel I/O stack and off-CPU events corresponding to blocking I/O. Also, the virutal speedup result for *fsync()* with *io\_heavy()* is higher than with *io\_light()*.
+
+## License
+
+Copyright for blocked samples is held by the Minwoo Ahn (Sungkyunkwan Univ.) and Jinkyu Jeong (Yonsei Univ.). Please contact us if you would like to obtain a license to use blocked samples in your commercial system.
+
+BCOZ and bperf are built on top of original COZ and Linux perf tool, respectively, which are licensed seperately. For detailed license information, please refer to the license in *bcoz* and *blocked\_samples*.
+
+## Contributors
+
+1. Minwoo Ahn, Sungkyunkwan Univ.
+2. Jinkyu Jeong, Yonsei Univ.
+
+## Acknowledgements
+
+TBU.
+
+## Contact
+
+Please contact us at `mwahn402@gmail.com` or `jinkyu@yonsei.ac.kr` with any questions.
