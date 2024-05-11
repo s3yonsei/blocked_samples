@@ -340,7 +340,7 @@ BCOZ shows virtual speedup results results for lines of application code that co
 
 Copyright for blocked samples is held by the Minwoo Ahn (Sungkyunkwan Univ.) and Jinkyu Jeong (Yonsei Univ.). Please contact us if you would like to obtain a license to use blocked samples in your commercial system.
 
-BCOZ and bperf are built on top of original COZ and Linux perf tool, respectively, which are licensed seperately. For detailed license information, please refer to the license in *bcoz* and *blocked\_samples*.
+BCOZ and bperf are built on top of original COZ and Linux perf tool, respectively, which are licensed seperately. For detailed license information, please refer to the license in *bcoz* and *blocked\_samples* directories.
 
 ## Contributors
 
