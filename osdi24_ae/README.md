@@ -3,32 +3,53 @@
 
 ## Title: Identifying On-/Off-CPU Bottlenecks Together with Blocked Samples
 
-
 Author: Minwoo Ahn, Jeongmin Han, Youngjin Kwon, Jinkyu Jeong
 
 Contact: Minwoo Ahn (mwahn402@gmail.com), Jinkyu Jeong (jinkyu@yonsei.ac.kr)
 
-### Introduction
+## Contents
+1. [Introduction](#1-introduction)
+2. [Artifacts Components](#2-artifacts-components)
+3. [Configurations](#3-configurations)
+4. [Getting Started Instructions](#4-getting-started-instructions)
+5. [Detailed Instructions](#5-detailed-instructions)
+6. [Conclusion](#6-conclusion)
 
-This repository is for reproduce the experimental results presented in the paper published at OSDI'24. Our evaluations are consists of 'motivational', 'RocksDB (*prefix_dist*, *allrandom*, *fillrandom*)', and 'NPB (*integer sort*)'. Furthermore, in this 
+## 1. Introduction
+
+This repository is for reproduce the experimental results presented in the paper published at OSDI'24. Our evaluations are consists of 'motivational', 'RocksDB (*prefix\_dist*, *allrandom*, *fillrandom*)', 'NPB (*integer sort*)', and 'overhead'.
+
+We recommend that follow the instructions below after you complete the [Getting Started with Blocked Samples](https://github.com/s3yonsei/blocked_samples/).
 
 #### Motivational
 Related figures: Figure 7, 9
 
 #### RocksDB
-Related figures: Figure 10, 12a, 12b, 13b, 13c, 14
+
+##### *prefix\_dist* (Section 4.2 - Optimization 1)
+
+Related figures: Figure 10
+
+##### *allrandom* (Section 4.2 - Optimization 2)
+
+Related figures: Figure 12a, 12b
+
+##### *fillrandom* (Section 4.3 - Optimization 3)
+
+Related figures: Figure 13b, 13c, 14
 
 #### NPB
 Related figures: Figure 15
 
 #### Overhead
+Related figures: Figure 16, 17
 
 
-### Artifacts components
+## 2. Artifacts components
 
-Blocked samples is consists of two main components: Linux perf subsystem (Linux kernel), and BCOZ source codes (bperf is included in Linux kernel). Both are maintained in a single external repository (https://github.com/s3yonsei/blocked_samples).
+Blocked samples is consists of two main components: Linux perf subsystem (Linux kernel), and BCOZ source codes (bperf is included in Linux kernel). Both are maintained in *bcoz* and *blocked\_samples* directories in this repository, respectively (https://github.com/s3yonsei/blocked\_samples).
 
-### Configurations
+## 3. Configurations
 
 | **Component** | **Specification**                  |
 |---------------|------------------------------------|
@@ -40,34 +61,9 @@ Blocked samples is consists of two main components: Linux perf subsystem (Linux 
 Note that, to evaluate our artifacts, not all system configurations are mendatory. However,
 
 
-## Getting Started Instructions
+## 4. Getting Started Instructions
+Please follow the instructions in [Getting Started with Blocked Samples](https://github.com/s3yonsei/blocked_samples/).
 
-### Clone related repositories
+## 5. Detailed Instructions
 
-### Linux kernel build
-
-### bperf build
-
-### BCOZ build
-
-## Detailed Instructions
-
-
-
-
-
-### Contents
-1. Introduction
-2. Configurations
-3. Software components
-4. Linux perf subsystem build
-5. bperf build
-6. BCOZ build
-7. (Optional) glibc build
-8. Application build
-9. Report profiling results
-
-
-### Getting Started Instructions
-
-### Detailed Instructions
+## 6. Conclusion
