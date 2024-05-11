@@ -344,8 +344,8 @@ BCOZ and bperf are built on top of original COZ and Linux perf tool, respectivel
 
 ## Contributors
 
-1. Minwoo Ahn, Sungkyunkwan Univ.
-2. Jinkyu Jeong, Yonsei Univ.
+* Minwoo Ahn, Sungkyunkwan Univ.
+* Jinkyu Jeong, Yonsei Univ.
 
 ## Acknowledgements
 
