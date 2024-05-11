@@ -328,8 +328,10 @@ Load the generated profile.coz file into [https://plasma-umass.org/coz/](https:/
 
 ##### 5-4-3. Results
 
-<img src="https://github.com/s3yonsei/blocked_samples/blob/main/osdi24_ae/benchmarks/simple_test/example_results/example-bperf.PNG " width="50%">
+![Example bperf sampling](https://github.com/s3yonsei/blocked_samples/osdi24_ae/benchmarks/simple_test/example_results/example-bperf.png)
 
-Off-CPU events' subclass is denoted in symbol section, inside the square brackets. Dot('.') and 'k' indicate on-CPU events, user and kernel, respectively, and 'I', 'L', 'S', and 'B' indicate off-CPU events, blocking I/O, lock-waiting, CPU scheduling, and other off-CPU events, respectively. In this microbenchmark, *fsync* is differentiated in on-CPU event, blocking I/O event, and other off-CPU events. Note that, on-CPU event consists of execution from application to 
+Off-CPU events' subclass is denoted in symbol section, inside the square brackets. Dot('.') and 'k' indicate on-CPU events, user and kernel, respectively, and 'I', 'L', 'S', and 'B' indicate off-CPU events, blocking I/O, lock-waiting, CPU scheduling, and other off-CPU events, respectively. In this microbenchmark, *fsync* is differentiated in on-CPU event, blocking I/O event (data block write), and other off-CPU events (wait for jbd2 thread to complete journaling).
 
-<img src="https://github.com/s3yonsei/blocked_samples/blob/main/osdi24_ae/benchmarks/simple_test/example_results/example-bcoz.PNG " width="90%">
+![Example bperf sampling](https://github.com/s3yonsei/blocked_samples/osdi24_ae/benchmarks/simple_test/example_results/example-bcoz.png)
+
+BCOZ shows virtual speedup results results for lines of application code that contain off-CPU events. The first figure shows the performance improvement estimates for improving blocking I/O only (fixed-subclass run), and the next two figures show the performance improvement estimates for improving *fsync()* calls contained in *io\_heavy()* and *io\_light()*, respectively. Note that, the behavior of *fsync()* shows higher virtual speedup results because it inclues on-CPU events from the application-level to the kernel I/O stack and off-CPU events corresponding to blocking I/O. Also, the virutal speedup result for *fsync()* with *io\_heavy()* is higher than with *io\_light()*.
