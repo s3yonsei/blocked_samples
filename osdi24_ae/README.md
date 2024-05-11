@@ -149,13 +149,27 @@ Load the generated `.coz` files into [plot](https://plasma-umass.org/coz/).
 
 #### 5-2-1. Build
 
+Many libraries are dynamically loaded when running db\_bench. As explained in [glibc build](https://github.com/s3yonsei/blocked_samples/tree/main?tab=readme-ov-file#getting-started-with-blocked-samples), to obtain correct profiling results, the libraries should be rebuilt to do not omit frame pointers. In our experiments, rather than rebuilt them, we statically link libraries with execution binary.
+
+```bash
+$ cd benchmarks/RocksDB
+$ make clean
+
+$ make librocksdb_debug.a DEBUG_LEVEL=2 -j
+$ make libsnappy.a DEBUG_LEVEL=2 -j
+$ make libzstd.a DEBUG_LEVEL=2 -j
+$ make libz.a DEBUG_LEVEL=2 -j
+$ make liblz4.a DEBUG_LEVEL=2 -j
+$ make lib
+```
+
 #### 5-2-2. RocksDB-*prefix\_dist*
 
 #### 5-2-3. RocksDB-*allrandom*
 
 #### 5-2-4. RocksDB-*fillrandom*
 
-### 5-3. NPB-*integer sort*
+### 5-3. NPB
 
 #### 5-3-1. Build
 
