@@ -328,8 +328,8 @@ Load the generated profile.coz file into [https://plasma-umass.org/coz/](https:/
 
 ##### 5-4-3. Results
 
-![Example bperf sampling](https://github.com/s3yonsei/blocked_samples/osdi24_ae/benchmarks/simple_test/example_results/example-bperf.png)
+![Example bperf sampling](https://github.com/s3yonsei/blocked_samples/osdi24_ae/benchmarks/simple_test/example_results/example-bperf.PNG)
 
 Off-CPU events' subclass is denoted in symbol section, inside the square brackets. Dot('.') and 'k' indicate on-CPU events, user and kernel, respectively, and 'I', 'L', 'S', and 'B' indicate off-CPU events, blocking I/O, lock-waiting, CPU scheduling, and other off-CPU events, respectively. In this microbenchmark, *fsync* is differentiated in on-CPU event, blocking I/O event, and other off-CPU events. Note that, on-CPU event consists of execution from application to 
 
-![Example bperf sampling](https://github.com/s3yonsei/blocked_samples/osdi24_ae/benchmarks/simple_test/example_results/example-bcoz.png)
+![Example bperf sampling](https://github.com/s3yonsei/blocked_samples/osdi24_ae/benchmarks/simple_test/example_results/example-bcoz.PNG)
