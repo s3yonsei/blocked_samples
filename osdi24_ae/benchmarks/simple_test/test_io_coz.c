@@ -75,7 +75,7 @@ void* t_function(void* arg)
 	fd = open(filename, O_WRONLY|O_CREAT, 0644);
 	if(fd == -1) printf("fd error...\n");
 
-	while(i < 10000) {
+	while(i < 50000) {
 		compute(20000);
 		
 		io_light(fd, buf);

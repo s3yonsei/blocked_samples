@@ -71,8 +71,6 @@ void profiler::startup(const string& outfile,
   if(based_speedup >= 0 && based_speedup <= 100)
     _based_fixed_delay_size = SamplePeriod * based_speedup / 100;
 
-  if (_based_blocked || _based_line)	std::cout << "Relational profiling enabled!!!" << std::endl;
-
   // Should end-to-end mode be enabled?
   _enable_end_to_end = end_to_end;
   _enable_print_log = print_log;
@@ -111,11 +109,6 @@ void profiler::startup(const string& outfile,
  * Body of the main profiler thread
  */
 void profiler::profiler_thread(spinlock& l) {
-  /*memset(&sa, 0, sizeof(sa));
-  sa.sa_sigaction = profiler::samples_ready_empty;
-  sa.sa_flags = SA_SIGINFO;
-  real::sigaction(SampleSignal, &sa, nullptr);*/
-
   // Open the output file
   ofstream output;
   ofstream fout;
@@ -123,8 +116,6 @@ void profiler::profiler_thread(spinlock& l) {
   output.rdbuf()->pubsetbuf(0, 0);
   output.setf(ios::fixed, ios::floatfield);
   output.precision(2);
-
-  std::cout << "start profiler_thread!!!" << std::endl;
 
   if (_enable_print_log) {
   	string filename("profiler");
@@ -149,8 +140,6 @@ void profiler::profiler_thread(spinlock& l) {
   // Unblock the main thread
   l.unlock();
   
-  std::cout << "Unblock the main thread!!!" << std::endl;
-
   // Wait until there is at least one progress point
   _throughput_points_lock.lock();
   _latency_points_lock.lock();
@@ -168,7 +157,6 @@ void profiler::profiler_thread(spinlock& l) {
   size_t sample_log_interval = 32;
   size_t sample_log_countdown = sample_log_interval;
 
-  std::cout << "Main experiment loop start!!!" << std::endl;
   // Main experiment loop
   while(_running) {
     // Select a line
@@ -226,27 +214,29 @@ void profiler::profiler_thread(spinlock& l) {
     size_t starting_blocked_scope = 0;
 
     if (_blocked_scope != 0) {
+		REQUIRE(_blocked_scope == 'a' || _blocked_scope == 'b' || _blocked_scope == 's' || _blocked_scope == 'l' || _blocked_scope == 'i' || _blocked_scope == 'o') << "No such blocked_scope!";
+
     	switch (_blocked_scope) {
-    			case 'a':
-					starting_blocked_scope = _blocked_all.load();
-					break;
-				case 'i':
-					starting_blocked_scope = _blocked_io.load();
-					break;
-				case 's':
-					starting_blocked_scope = _blocked_sched.load();
-					break;
-				case 'l':
-					starting_blocked_scope = _blocked_lock.load();
-					break;
-				case 'b':
-					starting_blocked_scope = _blocked_blocked.load();
-					break;
-				case 'o':
-					starting_blocked_scope = _blocked_oncpu.load();
-					break;
-				default:
-					std::cout << "No such blocked-scope!!! " << _blocked_scope << std::endl;
+    		case 'a':
+				starting_blocked_scope = _blocked_all.load();
+				break;
+			case 'i':
+				starting_blocked_scope = _blocked_io.load();
+				break;
+			case 's':
+				starting_blocked_scope = _blocked_sched.load();
+				break;
+			case 'l':
+				starting_blocked_scope = _blocked_lock.load();
+				break;
+			case 'b':
+				starting_blocked_scope = _blocked_blocked.load();
+				break;
+			case 'o':
+				starting_blocked_scope = _blocked_oncpu.load();
+				break;
+			default:
+				break;
     	};
     }
 
@@ -271,7 +261,7 @@ void profiler::profiler_thread(spinlock& l) {
     ex_count.fetch_add(1);
 
     // Wait until the experiment ends, or until shutdown if in end-to-end mode
-    if(_enable_end_to_end) {	std::cout << "End-to-end experiment start!!!" << std::endl;
+    if(_enable_end_to_end) {
       while(_running) {
         wait(SamplePeriod * SampleBatchSize);
       }
@@ -303,46 +293,47 @@ void profiler::profiler_thread(spinlock& l) {
     output << "experiment\tselected=";
 
 	if (_blocked_scope != 0) {
+		REQUIRE(_blocked_scope == 'a' || _blocked_scope == 'b' || _blocked_scope == 's' || _blocked_scope == 'l' || _blocked_scope == 'i' || _blocked_scope == 'o') << "No such blocked_scope!";
     	switch (_blocked_scope) {
-				case 'o':
-					output << "ON_CPU";
-					selected_samples = _blocked_oncpu.load() - starting_blocked_scope;
-					break;
-    			case 'i':
-					output << "IO";
-					selected_samples = _blocked_io.load() - starting_blocked_scope;
-					break;
-				case 'l':
-					output << "LOCK";
-					selected_samples = _blocked_lock.load() - starting_blocked_scope;
-					break;
-				case 's':
-					output << "SCHEDULING";
-					selected_samples = _blocked_sched.load() - starting_blocked_scope;
-					break;
-				case 'b':
-					output << "BLOCKED";
-					selected_samples = _blocked_blocked.load() - starting_blocked_scope;
-					break;
-				case 'a':
-					output << "OFF_CPU";
-					selected_samples = _blocked_all.load() - starting_blocked_scope;
-					break;
-				default:
-					std::cout << "No such blocked-scope!!! " << _blocked_scope << std::endl;
-    	}
+			case 'o':
+				output << "ON_CPU";
+				selected_samples = _blocked_oncpu.load() - starting_blocked_scope;
+				break;
+    		case 'i':
+				output << "IO";
+				selected_samples = _blocked_io.load() - starting_blocked_scope;
+				break;
+			case 'l':
+				output << "LOCK";
+				selected_samples = _blocked_lock.load() - starting_blocked_scope;
+				break;
+			case 's':
+				output << "SCHEDULING";
+				selected_samples = _blocked_sched.load() - starting_blocked_scope;
+				break;
+			case 'b':
+				output << "BLOCKED";
+				selected_samples = _blocked_blocked.load() - starting_blocked_scope;
+				break;
+			case 'a':
+				output << "OFF_CPU";
+				selected_samples = _blocked_all.load() - starting_blocked_scope;
+				break;
+			default:
+				break;
+    	};
 	} else	output << selected;
 
-	if (_based_line) {
-		//output << "(" << _based_line << "," << based_speedup << "%|)";
+	if (_based_line) {		//experimental feature
 		output << "(c_heavy," << based_speedup << "%|)";
 	} else if (_based_blocked) {
+		REQUIRE(_based_blocked == 'a' || _based_blocked == 'b' || _based_blocked == 's' || _based_blocked == 'l' || _based_blocked == 'i' || _based_blocked == 'o') << "No such blocked_scope!";
+
 		if (_based_blocked == 'i')	output << "(IO," << based_speedup << "%|)";
 		else if (_based_blocked == 'l')	output << "(LOCK," << based_speedup << "%|)";
 		else if (_based_blocked == 's')	output << "(SCHEDULING," << based_speedup << "%|)";
 		else if (_based_blocked == 'b')	output << "(BLOCKED," << based_speedup << "%|)";
 		else if (_based_blocked == 'a')	output << "(OFF_CPU," << based_speedup << "%|)";
-		else	std::cout << "No such blocked scope!!!" << std::endl;
 	}
 
     // Log the experiment parameters
@@ -630,9 +621,9 @@ void profiler::process_blocked_samples(thread_state* state) {
 	// Read recorded samples
 	for (perf_event::record r : state->sampler) {
 		if (r.is_sample()) {
-			if (r.get_time() <= state->last_sample_time)	{cout << "Already processed sample!!!!" << std::endl; continue;}
+			REQUIRE(r.get_time() > state->last_sample_time) << "Already processed sample!";
+			
 			state->last_sample_time = r.get_time();
-			//std::cout << "Sample's weight: " << r.get_weight() << std::endl;
 
 			// Find and matches the line that contains this sample.
 			// If, process_blocked_sample is true, process recorded sample directly.
@@ -711,10 +702,11 @@ void profiler::process_samples(thread_state* state) {
 
   for(perf_event::record r : state->sampler) {
     if(r.is_sample()) {
-      if (r.get_time() <= state->last_sample_time)	{cout << "Already processed sample!!!!" << std::endl; continue;}
-      state->last_sample_time = r.get_time();
-	  //std::cout << "(non-blocked) Sample's weight: " << r.get_weight() << std::endl;
-      // Find and matches the line that contains this sample
+      REQUIRE(r.get_time() > state->last_sample_time) << "Already processed sample!";
+      
+	  state->last_sample_time = r.get_time();
+      
+	  // Find and matches the line that contains this sample
       std::pair<line*, bool> sampled_line = match_line(r);
       if(sampled_line.first) {
         sampled_line.first->add_sample(r.get_weight() + 1);
@@ -741,7 +733,6 @@ void profiler::process_samples(thread_state* state) {
 					} else if ((_blocked_scope == 'b') && r.is_blocked()) {
 						_blocked_blocked.fetch_add(r.get_weight() + 1);
 					} else if ((_blocked_scope == 'a') && r.is_blocked_any()) {
-						std::cout << "Blocked sample!!!" << std::endl;
 						_blocked_all.fetch_add(r.get_weight() + 1);
 					} else if ((_blocked_scope == 'o') && !r.is_blocked_any()){
 						_blocked_oncpu.fetch_add(r.get_weight() + 1);
@@ -777,11 +768,6 @@ void* profiler::start_profiler_thread(void* arg) {
   real::pthread_exit(nullptr);
   // Unreachable return silences compiler warning
   return nullptr;
-}
-
-void profiler::samples_ready_empty(int signum, siginfo_t* info, void *p) {
-	std::cout << "Profiler thread get SIGPROF!!!" << std::endl;
-	return;
 }
 
 void profiler::samples_ready(int signum, siginfo_t* info, void* p) {

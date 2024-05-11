@@ -227,7 +227,6 @@ static int wrapped_main(int argc, char** argv, char** env) {
   size_t startup = 0;
   size_t end_to_end_time = 0;
   size_t real_main_time = 0;
-  std::cout << "Start wrapped_main" << std::endl;
 
   if (!initialized)
     init_coz();
@@ -278,7 +277,7 @@ extern "C" int coz_libc_start_main(main_fn_t main_fn, int argc, char** argv,
 }
 
 /// Remove coz's required signals from a signal mask
-static void remove_coz_signals(sigset_t* set) { std::cout << "Inside remove_coz_signals!!!" << std::endl;
+static void remove_coz_signals(sigset_t* set) { 
   if(sigismember(set, SampleSignal)) {
     sigdelset(set, SampleSignal);
   }
@@ -335,7 +334,6 @@ extern "C" {
   /*void *mmap(void *mmap_addr, size_t length, int prot, int flags, int fd, __off_t offset) {
 	void *result = real::mmap(mmap_addr, length, prot, flags, fd, offset);
 	if (initialized)	profiler::get_instance().call_process_blocked_samples();
-	std::cout << "Right after mmap!!!" << std::endl;
 	return result;
   }*/
 

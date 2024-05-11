@@ -290,9 +290,14 @@ $ make clean && make
 ##### 5-4-1. bperf
 
 ```bash
+[Record]
 $ bperf record -g -e task-clock -c 1000000 --weight ./test_io
+
+[Change the name of the output file]
 $ mv perf.data perf_weight.data
 ```
+
+It is recommended to change the name of generated perf.data file, otherwise it will be overwritten.
 
 After recording, you can report the perf result.
 
@@ -304,10 +309,9 @@ $ bperf report -i perf_weight.data
 $ bperf report -i perf_weight.data --no-children
 ```
 
-(정확한 그림 예시를 넣어야 설명 가능할듯.)
-Off-CPU events' subclass is denoted in symbol section, inside the square brackets. Dot('.') and 'k' indicate on-CPU events, user and kernel, respectively, and 'I', 'L', 'S', and 'B' indicate off-CPU events, blocking I/O, lock-waiting, CPU scheduling, and other off-CPU events, respectively. In this microbenchmark, *fsync* is differentiated in on-CPU event, blocking I/O event, and other off-CPU events. Note that, on-CPU event consists of execution from application to 
-
 ##### 5-4-2. BCOZ
+
+The run below will generate a profile.coz file. Note that, as you run it repeatedly, the profile.coz will accumulate virtual speedup results, allowing you to see more causal profiling results.
 
 ```bash
 [Default run]
@@ -320,7 +324,12 @@ $ bcoz run --blocked-scope i --- ./test_io_coz
 $ bcoz run --fixed-line test_io_coz.c:55 --- ./test_io_coz
 ```
 
-Load the generated profile.coz file into [plotter of COZ](https://plasma-umass.org/coz/).
+Load the generated profile.coz file into [https://plasma-umass.org/coz/](https://plasma-umass.org/coz/). (**혹시 이게 문제가 될까요?**)
 
+##### 5-4-3. Results
 
-##### 5-4-3. (Misc.) Flamegraph
+![Example bperf sampling](https://github.com/s3yonsei/blocked_samples/osdi24_ae/benchmarks/simple_test/example_results/example-bperf.png)
+
+Off-CPU events' subclass is denoted in symbol section, inside the square brackets. Dot('.') and 'k' indicate on-CPU events, user and kernel, respectively, and 'I', 'L', 'S', and 'B' indicate off-CPU events, blocking I/O, lock-waiting, CPU scheduling, and other off-CPU events, respectively. In this microbenchmark, *fsync* is differentiated in on-CPU event, blocking I/O event, and other off-CPU events. Note that, on-CPU event consists of execution from application to 
+
+![Example bperf sampling](https://github.com/s3yonsei/blocked_samples/osdi24_ae/benchmarks/simple_test/example_results/example-bcoz.png)
