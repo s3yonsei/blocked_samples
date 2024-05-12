@@ -143,14 +143,10 @@ export PATH=~/blocked_samples/blocked_samples/tools/perf:$PATH
 $ bperf record -g -e task-clock -c 1000000 --weight sleep 5
 ...
 [ perf record: Captured and wrote x MB perf.data (5000 samples) ]
-
-$ perf record -g -e task-clock -c 1000000 sleep 5
-...
-[ perf record: Captured and wrote x MB perf.data (1 samples) ]
 ```
 
 This command records task-clock event and the sample is recorded every 1M events. Note that, the task-clock event is counted every 1ns, which means 1M events indicates that the sampling period is 1ms.
-If the number of the recorded samples after record is nearly **5000**, blockes samples is correctly imported with bperf (5000 samples indicates 5 sec). Please compare the results with perf.
+If the number of the recorded samples after record is nearly **5000**, blockes samples is correctly imported with bperf (5000 samples indicates 5 sec).
 
 
 ### 4. BCOZ build
