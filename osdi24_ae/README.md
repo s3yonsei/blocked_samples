@@ -132,10 +132,10 @@ $ ./motivational_bcoz.sh
 ```
 Load the generated `.coz` files (profile\_case1.coz and profile\_case2.coz) into [plot](https://plasma-umass.org/coz/).
 
-Although the reported results and the Figure 9 may differ in details, you should be able to figure out the followings.
+**Note**: Although the reported results and the Figure 9 may differ in details, you should be able to figure out the followings.
 
-* `Case 1` - There is no performance gain from optimizing I/O events (*pread*, *pwrite*, and I/O subclass) and only *compute\_heavy* function have performance gain from optimization.
-* `Case 2` - There is no performance gain from optimizing *compute\_heavy* function and there are performance gain from optimizing *pread*, *pwrite*, and I/O subclass.
+* `Case 1` - There is no predicted performance gain from optimizing I/O events (*pread*, *pwrite*, and I/O subclass) and only *compute\_heavy* function have predicted performance gain from optimization.
+* `Case 2` - There is no predicted performance gain from optimizing *compute\_heavy* function and there are predicted performance gain from optimizing *pread*, *pwrite*, and I/O subclass.
 
 ### 5-3. RocksDB
 
@@ -174,62 +174,122 @@ $ cp /lib/x86_64-linux-gnu/libgflags.so.2.2 /usr/local/lib/glibc-testing/lib
 
 #### 5-3-2. Data loading
 
-In experiments RocksDB-*prefix\_dist* and RocksDB-*allrandom*, we perform a read-only workload on the same dataset. Load 100GB of data on each SSD. Data load takes about x hours each.
+In experiments RocksDB-*prefix\_dist* and RocksDB-*allrandom*, we perform a read-only workload on the same dataset. Load 100GB of data on each SSD. Data load takes about 2~3 hours each with our SSDs.
 
 ```bash
-[Load data to fast ssd]
-$ ./db_bench_perf --threads=1 --bloom_bits=10 --num=$((1024*1024*1024)) --key_size=48 --value_size=43 --cache_size=$((10*1024*1024*1024)) \
---use_direct_reads=true --use_direct_io_for_flush_and_compaction=true --ttl_seconds=$((60*60*24*30*12)) --partition_index=true \
---partition_index_and_filters=true --db=/media/nvme_fast/rocksdb_partitioned --use_existing_db=false --max_write_buffer_number=16 --compression_type=none \
+[Load data on fast ssd]
+$ ./db_bench_perf --threads=1 --bloom_bits=10 --num=$((1024*1024*1024)) --key_size=48 --value_size=43 \
+--cache_size=$((10*1024*1024*1024)) --use_direct_reads=true --use_direct_io_for_flush_and_compaction=true \
+--ttl_seconds=$((60*60*24*30*12)) --partition_index=true --partition_index_and_filters=true \
+--db=/media/nvme_fast/rocksdb_partitioned --use_existing_db=false --max_write_buffer_number=16 --compression_type=none \
 --max_background_compactions=2 --benchmarks=filluniquerandom
 
-[Load data to slow ssd]
-$ ./db_bench_perf --threads=1 --bloom_bits=10 --num=$((1024*1024*1024)) --key_size=48 --value_size=43 --cache_size=$((10*1024*1024*1024)) \
---use_direct_reads=true --use_direct_io_for_flush_and_compaction=true --ttl_seconds=$((60*60*24*30*12)) --partition_index=true \
---partition_index_and_filters=true --db=/media/nvme_slow/rocksdb_partitioned --use_existing_db=false --max_write_buffer_number=16 --compression_type=none \
+[Load data on slow ssd]
+$ ./db_bench_perf --threads=1 --bloom_bits=10 --num=$((1024*1024*1024)) --key_size=48 --value_size=43 \
+--cache_size=$((10*1024*1024*1024)) --use_direct_reads=true --use_direct_io_for_flush_and_compaction=true \
+--ttl_seconds=$((60*60*24*30*12)) --partition_index=true --partition_index_and_filters=true \
+--db=/media/nvme_slow/rocksdb_partitioned --use_existing_db=false --max_write_buffer_number=16 --compression_type=none \
 --max_background_compactions=2 --benchmarks=filluniquerandom
 ```
 
-**Note**: Due to the data left in the memtable, compaction will occur once when you first run the workload. Perf a dummy run (not for performance measurement) once per dataset to ensure that compaction does not occur in subsequent read-only workload.
+**Note**: Due to the data left in the memtable, compaction will occur once when you first run the workload. Execute a dummy run (not for performance measurement) once per dataset to ensure that compaction does not occur in subsequent read-only workload.
 
 ```bash
 [Dummy run on dataset in fast ssd]
-$ ./db_bench_perf --threads=1 --cache_index_and_filter_blocks=true --bloom_bits=10 --partition_index=true --partition_index_and_filters=true \
---num=$((1024*1024*1024)) --reads=$((1024)) --use_direct_reads=true --key_size=48 --value_size=43  --cache_numshardbits=-1 --db=/media/nvme_fast \
---use_existing_db=1 --cache_size=$((10*1024*1024*1024)) --benchmarks=mixgraph --key_dist_a=0.002312 --key_dist_b=0.3467 --keyrange_dist_a=14.18 \
---keyrange_dist_b=-2.917 --keyrange_dist_c=0.0164 --keyrange_dist_d=-0.08082 --keyrange_num=30 --mix_get_ratio=1 --mix_put_ratio=0 --mix_seek_ratio=0 \
---value_k=0.2615 --value_sigma=25.45 --iter_k=2.517 --iter_sigma=14.236  --sine_mix_rate_interval_milliseconds=5000 --sine_a=1000 --sine_b=0.000073 \
---sine_d=4500
+$ ./db_bench_perf --threads=1 --cache_index_and_filter_blocks=true --bloom_bits=10 --partition_index=true \
+--partition_index_and_filters=true --num=$((1024*1024*1024)) --reads=1024 --use_direct_reads=true --key_size=48 \
+--value_size=43  --cache_numshardbits=-1 --db=/media/nvme_fast --use_existing_db=1 --cache_size=$((10*1024*1024*1024)) \
+--benchmarks=mixgraph --key_dist_a=0.002312 --key_dist_b=0.3467 --keyrange_dist_a=14.18 --keyrange_dist_b=-2.917 \
+--keyrange_dist_c=0.0164 --keyrange_dist_d=-0.08082 --keyrange_num=30 --mix_get_ratio=1 --mix_put_ratio=0 \
+--mix_seek_ratio=0 --value_k=0.2615 --value_sigma=25.45 --iter_k=2.517 --iter_sigma=14.236 \
+--sine_mix_rate_interval_milliseconds=5000 --sine_a=1000 --sine_b=0.000073 --sine_d=4500
 
 [Dummy run on dataset in slow ssd]
-$ ./db_bench_perf --threads=1 --cache_index_and_filter_blocks=true --bloom_bits=10 --partition_index=true --partition_index_and_filters=true \
---num=$((1024*1024*1024)) --reads=$((1024)) --use_direct_reads=true --key_size=48 --value_size=43  --cache_numshardbits=-1 --db=/media/nvme_slow \
---use_existing_db=1 --cache_size=$((10*1024*1024*1024)) --benchmarks=mixgraph --key_dist_a=0.002312 --key_dist_b=0.3467 --keyrange_dist_a=14.18 \
---keyrange_dist_b=-2.917 --keyrange_dist_c=0.0164 --keyrange_dist_d=-0.08082 --keyrange_num=30 --mix_get_ratio=1 --mix_put_ratio=0 --mix_seek_ratio=0 \
---value_k=0.2615 --value_sigma=25.45 --iter_k=2.517 --iter_sigma=14.236  --sine_mix_rate_interval_milliseconds=5000 --sine_a=1000 --sine_b=0.000073 \
---sine_d=4500
+$ ./db_bench_perf --threads=1 --cache_index_and_filter_blocks=true --bloom_bits=10 --partition_index=true \
+--partition_index_and_filters=true --num=$((1024*1024*1024)) --reads=1024 --use_direct_reads=true --key_size=48 \
+--value_size=43  --cache_numshardbits=-1 --db=/media/nvme_fast --use_existing_db=1 --cache_size=$((10*1024*1024*1024)) \
+--benchmarks=mixgraph --key_dist_a=0.002312 --key_dist_b=0.3467 --keyrange_dist_a=14.18 --keyrange_dist_b=-2.917 \
+--keyrange_dist_c=0.0164 --keyrange_dist_d=-0.08082 --keyrange_num=30 --mix_get_ratio=1 --mix_put_ratio=0 \
+--mix_seek_ratio=0 --value_k=0.2615 --value_sigma=25.45 --iter_k=2.517 --iter_sigma=14.236 \
+--sine_mix_rate_interval_milliseconds=5000 --sine_a=1000 --sine_b=0.000073 --sine_d=4500
 ```
 
-#### 5-3-3. RocksDB-*prefix\_dist*
+#### 5-3-3. RocksDB-*prefix_dist*
+
+In this experiment, BCOZ identifies and address the bottleneck of block cache operations in a read-only workload. We profiled read-only execution of *prefix_dist*, an open-sourced real-world workload by Facebook. The number of shard is one to reproduce the well-known lock contention problem of RocksDB's LRU-based block cache.
+
+Figure 12a is obtained by profiling with BCOZ.
 
 ```bash
-$ ./db_bench_perf --threads=8 --cache_index_and_filter_blocks=true --bloom_bits=10 --partition_index=true --partition_index_and_filters=true \
---num=$((1024*1024*1024)) --reads=$((1024*1024)) --use_direct_reads=true --key_size=48 --value_size=43  --cache_numshardbits=${shard_bits} --db=${dbdir} \
---use_existing_db=1 --cache_size=$((10*1024*1024*1024)) --benchmarks=mixgraph --key_dist_a=0.002312 --key_dist_b=0.3467 --keyrange_dist_a=14.18 \
---keyrange_dist_b=-2.917 --keyrange_dist_c=0.0164 --keyrange_dist_d=-0.08082 --keyrange_num=30 --mix_get_ratio=1 --mix_put_ratio=0 --mix_seek_ratio=0 \
---value_k=0.2615 --value_sigma=25.45 --iter_k=2.517 --iter_sigma=14.236  --sine_mix_rate_interval_milliseconds=5000 --sine_a=1000 --sine_b=0.000073 \
---sine_d=4500
+$ ./rocksdb_1_bcoz.sh
 ```
+
+Load the generated profile.coz into [plot](https://plasma-umass.org/coz/).
+
+**Note**: Although the reported results and the Figure 10a may differ in details, you should be able to figure out the predicted performance gain through optimizing lock contention (*GetDataBlockFromCache*) is larger than optimizing I/O event (*ReadBlockContents*). 
+
+Figure 10b is obtained by running `db_bench_perf` while adjusting options.
+
+```bash
+$ ./rocksdb_1_performance.sh
+```
+
+The command for the baseline experiment is as follows. 
+
+```bash
+$ ./db_bench_perf --threads=8 --cache_index_and_filter_blocks=true --bloom_bits=10 --partition_index=true \
+--partition_index_and_filters=true --num=$((1024*1024*1024)) --reads=$((1024*1024)) --use_direct_reads=true \
+--key_size=48 --value_size=43  --cache_numshardbits=0 --db=/media/nvme_slow --use_existing_db=1 \
+--cache_size=$((10*1024*1024*1024)) --benchmarks=mixgraph --key_dist_a=0.002312 --key_dist_b=0.3467 \
+--keyrange_dist_a=14.18 --keyrange_dist_b=-2.917 --keyrange_dist_c=0.0164 --keyrange_dist_d=-0.08082 \
+--keyrange_num=30 --mix_get_ratio=1 --mix_put_ratio=0 --mix_seek_ratio=0 --value_k=0.2615 --value_sigma=25.45 \
+--iter_k=2.517 --iter_sigma=14.236  --sine_mix_rate_interval_milliseconds=5000 --sine_a=1000 --sine_b=0.000073 --sine_d=4500
+```
+
+* `SSD+`: change *db* to /media/nvme\_fast.
+* Shard-X: change *cache_numshardbits* from 0 to 1-6 (e.g., *cache_numshardbits* value of Shard-16 is 4).
 
 #### 5-3-4. RocksDB-*allrandom*
 
+In this experiment, BCOZ identifies and address the bottleneck where I/O events become a bottleneck as block cache lock contention is resovled. We profiled read-only execution of *allrandom*, an open-sourced real-world workload by Facebook. The size of the block cache is 128MB to incur a large amount of I/O events.
+
+Figure 12a is obtained by profiling with BCOZ.
+
 ```bash
-./db_bench_perf --threads=8 --cache_index_and_filter_blocks=true --bloom_bits=10 --partition_index=true --partition_index_and_filters=true \
---num=$((1024*1024*1024)) --reads=$((1024*1024)) --use_direct_reads=true --key_size=48 --value_size=43  --cache_numshardbits=-1 --db=${dbdir} \
---use_existing_db=1 --cache_size=$((128*1024*1024)) --benchmarks=mixgraph --keyrange_num=1 --value_k=0.2615 --value_sigma=25.45 --iter_k=2.517 \
---iter_sigma=14.236 --mix_get_ratio=1 --mix_put_ratio=0 --mix_seek_ratio=0 --sine_mix_rate_interval_milliseconds=5000 --sine_a=1000 --sine_b=0.000073 \
---sine_d=4500
+$ ./rocksdb_2_bcoz.sh
 ```
+
+Load the generated profile.coz into [plot](https://plasma-umass.org/coz/).
+
+**Note**: Although the reported results and the Figure 12a may differ in details, you should be able to figure out the predicted performance gain through optimizing blocking I/O events (I/O subclass in the figure) is high. Furthermore, predicted performance gain through optimizing filter block read (*GetFilterPartitionBlock*) is highest among the index and data block reads (*IndexBlockIter* and *DataBlockIter*, respectively).
+
+Figure 12b is obtained by comparing the result of baseline and optimized execution. Optimized RocksDB code is in rocksdb\_aio.
+
+```bash
+$ cd ../rocksdb_aio
+$ make libsnappy.a DEBUG_LEVEL=2 -j $(nproc)
+$ make libzstd.a DEBUG_LEVEL=2 -j $(nproc)
+$ make db_bench -j $(nproc)
+$ mv db_bench db_bench_perf
+$ cd ../rocksdb
+```
+
+```bash
+$ ./rocksdb_2_performance.sh
+```
+
+The command for the both execution is as follows.
+
+```bash
+$ ./db_bench_perf --threads=8 --cache_index_and_filter_blocks=true --bloom_bits=10 --partition_index=true \
+--partition_index_and_filters=true --num=$((1024*1024*1024)) --reads=$((1024*1024)) --use_direct_reads=true \
+--key_size=48 --value_size=43  --cache_numshardbits=-1 --db=/media/nvme_fast --use_existing_db=1 \
+--cache_size=$((128*1024*1024)) --benchmarks=mixgraph --keyrange_num=1 --value_k=0.2615 --value_sigma=25.45 \
+--iter_k=2.517 --iter_sigma=14.236 --mix_get_ratio=1 --mix_put_ratio=0 --mix_seek_ratio=0 \
+--sine_mix_rate_interval_milliseconds=5000 --sine_a=1000 --sine_b=0.000073 --sine_d=4500
+```
+
+**Note**: We used fast SSD in this experiment.
 
 #### 5-3-5. RocksDB-*fillrandom*
 
