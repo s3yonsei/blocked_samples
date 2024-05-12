@@ -247,7 +247,7 @@ $ ./db_bench_perf --threads=8 --cache_index_and_filter_blocks=true --bloom_bits=
 ```
 
 * `SSD+`: change *db* to /media/nvme\_fast.
-* Shard-X: change *cache_numshardbits* from 0 to 1-6 (e.g., *cache_numshardbits* value of Shard-16 is 4).
+* `Shard-X`: change *cache_numshardbits* from 0 to 1-6 (e.g., *cache_numshardbits* value of Shard-16 is 4).
 
 #### 5-3-4. RocksDB-*allrandom*
 
@@ -293,9 +293,39 @@ $ ./db_bench_perf --threads=8 --cache_index_and_filter_blocks=true --bloom_bits=
 
 #### 5-3-5. RocksDB-*fillrandom*
 
+In this experiment, BCOZ identifies and address the bottleneck of write-only workload. We profiled *fillrandom* in db\_bench. The size of the key-value pair is 1KB and the number of worker thread is 16.
+
+
+Figure 13b, 13c are obtained by profiling with BCOZ
+
 ```bash
-./db_bench_perf --threads=16 --bloom_bits=10 --num=$((10*1024*1024)) --key_size=48 --value_size=43 --cache_size=$((10*1024*1024*1024)) \ --use_direct_reads=true --use_direct_io_for_flush_and_compaction=true --ttl_seconds=$((60*60*24*30*12)) --partition_index=true \ --partition_index_and_filters=true --db=${dbdir} --use_existing_db=false --max_write_buffer_number=2 --max_background_compactions=2 \ --benchmarks=fillrandom
+$ ./rocksdb_3_bcoz.sh
 ```
+
+Load the generated profile.coz into [plot](https://plasma-umass.org/coz/).
+
+**Note**: Although the reported results and the Figure 13b, 13c may differ in details, you should be able to figure out the predicted performance gain through optimizing compression events is higher than optimizing I/O events. Furthermore, optimizing synchronization between worker threads and write stall of worker threads are more important than optimizing WAL (write-ahead-log) events.
+
+Figure 14 is obtained by running `db_bench_perf` while adjusting options.
+
+```bash
+$ ./rocksdb_3_performance.sh
+```
+
+The command for the baseline execution is as follows.
+
+```bash
+./db_bench_perf --threads=16 --bloom_bits=10 --num=$((10*1024*1024)) --key_size=48 --value_size=43 \
+--cache_size=$((10*1024*1024*1024)) --use_direct_reads=true --use_direct_io_for_flush_and_compaction=true \
+--ttl_seconds=$((60*60*24*30*12)) --partition_index=true --partition_index_and_filters=true --db=${dbdir} \
+--use_existing_db=false --max_write_buffer_number=2 --max_background_compactions=1 --benchmarks=fillrandom
+```
+
+* `RamDisk`: change *db* to the ramdisk.
+* `no-WAL`: add --disable\_wal=true to the command.
+* `Compress+`: add --compress\_type=none to the command.
+* `Comp+`: increase the number of *max_background_compactions* to 2
+* `Stall`: increase the number of *max_write_buffer_number* to 16
 
 ### 5-4. NPB
 
