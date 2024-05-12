@@ -136,7 +136,7 @@ $ sudo sh -c 'echo 0 > /proc/sys/kernel/kptr_restrict'
 #### 3-3. Set environment variable
 
 ```bash
-export PATH=~/blocked_samples/blocked_samples/tools/perf:$PATH
+$ export PATH=~/blocked_samples/blocked_samples/tools/perf:$PATH
 ```
 
 #### 3-4. Simple test for bperf
