@@ -23,6 +23,9 @@ This directory includes source code of BCOZ. BCOZ is a causal profiler that leve
 ### blocked\_samples
 This directory includes extended Linux perf subsystem for blocked samples. Blocked samples is a profiling technique based on sampling, that encompasses both on- and off-CPU events simultaneously. Furthermore, the original Linux perf tool is replaced with bperf (blocked\_samples/tools/perf).
 
+### benchmarks
+This directory includes profiling example with BCOZ.
+
 ### osdi24\_ae
 This directory is for OSDI'24 artifacts evaluation. It includes instructions for reproducing experimental results in the paper.
 
@@ -112,7 +115,6 @@ $ cd /trusted/local/lib/glibc-testing/lib
 $ cp /usr/local/lib/glibc-testing/lib/ld-2.30.so ./
 $ ln -s ld-2.30.so ld-linux.so.2
 ```
-
 
 ### 3. bperf build
 
@@ -322,24 +324,24 @@ The run below will generate a profile.coz file. Note that, as you run it repeate
 
 ```bash
 [Default run]
-$ bcoz run --- ./test_io_coz
+$ bcoz run --- ./test_io_bcoz
 
 [Fixed-subclass (I/O)]
-$ bcoz run --blocked-scope i --- ./test_io_coz
+$ bcoz run --blocked-scope i --- ./test_io_bcoz
 
 [Fixed-line run]
-$ bcoz run --fixed-line test_io_coz.c:55 --- ./test_io_coz
+$ bcoz run --fixed-line test_io_coz.c:55 --- ./test_io_bcoz
 ```
 
-Load the generated profile.coz file into [https://plasma-umass.org/coz/](https://plasma-umass.org/coz/). (**혹시 이게 문제가 되진 않을까요?**)
+Load the generated profile.coz file into [COZ plotter](https://plasma-umass.org/coz/).
 
 ##### 5-4-3. Results
 
-<img src="https://github.com/s3yonsei/blocked_samples/blob/main/osdi24_ae/benchmarks/simple_test/example_results/example-bperf.PNG " width="100%">
+<img src="https://github.com/s3yonsei/blocked_samples/blob/main/benchmarks/simple_test/example_results/example-bperf.PNG " width="100%">
 
 Off-CPU events' subclass is denoted in symbol section, inside the square brackets. Dot('.') and 'k' indicate on-CPU events, user and kernel, respectively, and 'I', 'L', 'S', and 'B' indicate off-CPU events, blocking I/O, lock-waiting, CPU scheduling, and other off-CPU events (e.g., *sleep*), respectively. In this microbenchmark, *fsync* is differentiated in on-CPU event ([.]), blocking I/O event ([I]), and other off-CPU events ([B]).
 
-<img src="https://github.com/s3yonsei/blocked_samples/blob/main/osdi24_ae/benchmarks/simple_test/example_results/example-bcoz.PNG " width="100%">
+<img src="https://github.com/s3yonsei/blocked_samples/blob/main/benchmarks/simple_test/example_results/example-bcoz.PNG " width="100%">
 
 BCOZ shows virtual speedup results results for lines of application code that contain off-CPU events. The first figure shows the performance improvement estimates for improving blocking I/O only (fixed-subclass run), and the next two figures show the performance improvement estimates for improving *fsync()* calls contained in *io\_heavy()* and *io\_light()*, respectively. Note that, the behavior of *fsync()* shows higher virtual speedup results because it inclues on-CPU events from the application-level to the kernel I/O stack and off-CPU events corresponding to blocking I/O. Also, the virutal speedup result for *fsync()* with *io\_heavy()* is higher than with *io\_light()*.
 
