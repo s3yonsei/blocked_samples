@@ -28,6 +28,8 @@ This directory is for OSDI'24 artifacts evaluation. It includes instructions for
 
 ## Getting Started with Blocked Samples
 
+We assume that this repository is located in user's home directory.
+
 ### 0. Ubuntu version
 The Linux kernel version of blocked samples is 5.3.7 and may not compiled on Ubuntu versions newer than Ubuntu 20.04 (Ubuntu 20.04 LTS server is recommended). We will port the blocked samples to a newer kernel in the near future.
 
@@ -46,7 +48,8 @@ $ apt-get install build-essential libncurses5 libncurses5-dev bin86 kernel-packa
 #### 1-2. Kernel configurations
 
 ```bash
-$ make menuconfig
+$ cd ~/blocked_samples/blocked_samples
+$ sudo make menuconfig
 ```
 
 To profiling kernel debug information the following configurations should be set.
@@ -97,7 +100,7 @@ $ tar -xf glibc-2.30.tar.gz
 [Make build directory (recommended gcc version<=9.4.0)]
 $ mkdir glibc-build
 $ cd glibc-build
-$ ../glibc-2.30/configure --prefix=/usr/local/lib/glibc-testing --with-tls --enable-add-ons=nptl --enable-cet CFLAGS='-g -gdwarf-4 -fno-omit-frame-pointer' CXXFLAGS='-g -gdwarf-4 -fno-omit-frame-pointer' CPPFLAGS='-g -gdwarf4 -fno-omit-frame-pointer'
+$ ../glibc-2.30/configure --prefix=/usr/local/lib/glibc-testing --with-tls --enable-add-ons=nptl --enable-cet CFLAGS='-O3 -g -gdwarf-4 -fno-omit-frame-pointer' CXXFLAGS='-O3 -g -gdwarf-4 -fno-omit-frame-pointer' CPPFLAGS='-O3 -g -gdwarf-4 -fno-omit-frame-pointer'
 
 [make and install]
 $ make
@@ -118,20 +121,20 @@ To enable features of Linux perf tool, following packages are needed.
 
 ```bash
 $ apt-get update
-$ apt-get install libdw-dev systemtap-sdt-dev libunwind-dev libslang2-dev libperl-dev libzstd-dev libcap-dev libnuma-dev libbabeltrace-dev libbabeltrace-ctf-dev libcapstone-dev libpfm4-dev libtraceevent-dev libbfd-dev
+$ apt-get install libdw-dev systemtap-sdt-dev libunwind-dev libslang2-dev libgtk2.0-dev libperl-dev python-dev binutils-dev libiberty-dev liblzma-dev libzstd-dev libnuma-dev libbabeltrace-ctf-dev libaudit-dev
 ```
 
 #### 3-2. Build bperf source code
 ```bash
-$ cd blocked_samples/tools/perf
-$ make clean && make
-$ mv perf bperf
+$ cd ~/blocked_samples/blocked_samples/tools/perf
+$ sudo make clean && sudo make
+$ sudo mv perf bperf
 ```
 
 #### 3-3. Set environment variable
 
 ```bash
-export PATH=[path/to/bperf]:$PATH
+export PATH=~/blocked_samples/blocked_samples/tools/perf:$PATH
 ```
 
 #### 3-4. Simple test for bperf
