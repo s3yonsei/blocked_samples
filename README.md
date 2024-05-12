@@ -171,7 +171,7 @@ $ sudo make install
 #### 4-3. Set environment variable
 
 ```bash
-export PATH=~/blocked_samples/bcoz:$PATH
+$ export PATH=~/blocked_samples/bcoz:$PATH
 ```
 
 #### 4-4. Change 'perf\_event\_paranoid'
