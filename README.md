@@ -187,15 +187,16 @@ $ sudo sh -c 'echo 1 > /proc/sys/kernel/perf_event_paranoid'
 
 #### 5-1. Compile application with additional flags
 
-To profile the application with bperf and BCOZ, additional compile flags are needed. Following flags are needed to compile application and libraries that loaded dynamically. However, it is hard to compile all loaded libraries. Note that, to take full advantage of BCOZ (and COZ), libraries belonging to symbols in frequently sampled callchains must be compiled with the following flags. Otherwise, the results of virtual speedup will no be meaningful, or the predicted results will be inaccurate.
+To profile the application with bperf and BCOZ, additional compile flags are needed. Following flags are needed to compile application and libraries that loaded dynamically. However, it is hard to compile all loaded libraries. Note that, to take full advantage of BCOZ (and COZ), libraries belonging to symbols in frequently sampled callchains must be compiled with the following flags. Otherwise, the results of virtual speedup will not be meaningful, or the predicted results will be inaccurate.
 
 ```bash
--g -gdwarf-4 -fno-omit-frame-pointer -Wl,--no-as-needed -ldl -Wl,--rpath=/usr/local/lib/glibc-testing/lib -Wl,--dynamic-linker=/trusted/local/lib/glibc-testing/lib/ld-linux.so.2
+(Flags for CFLAGS and CXXFLAGS) -g -gdwarf-4 -fno-omit-frame-pointer
+(Flags for LDFLAGS) -Wl,--no-as-needed -ldl -Wl,--rpath=/usr/local/lib/glibc-testing/lib -Wl,--dynamic-linker=/trusted/local/lib/glibc-testing/lib/ld-linux.so.2
 ```
 
-* '-g -gdwarf-4' is for debug information. Especially, gdwarf-4 is needed for BCOZ (and COZ).
-* '-fno-omit-frame-pointer' is for preserve frame pointer.
-* '-Wl,--no-as-needed -ldl -Wl,--rpath=/usr/local/lib/glibc-testing/lib' is for use newly built glibc library. *rpath* and *dynamic-linker* are directories of newly built glibc and dynamic loader in [glibc build](#2-glibc-build), respectively. If you followed instructions in part 2, you can use as written above.
+* `-g -gdwarf-4` is for debug information. Especially, gdwarf-4 is needed for BCOZ (and COZ).
+* `-fno-omit-frame-pointer` is for preserve frame pointer.
+* `-Wl,--no-as-needed -ldl -Wl,--rpath -Wl,--dynamic-linker` is for use newly built glibc library. *rpath* and *dynamic-linker* are directories of newly built glibc and dynamic loader in [glibc build](#2-glibc-build), respectively. If you followed instructions in part 2, you can use as written above.
 
 **Note**: When you compile and run your application as above, you may get an error that some shared libraries are not found, even though they exist. In this case, find the location of shared library by using `$ locate` and copying it to `/usr/local/lib/glibc-testing/lib`.
 
