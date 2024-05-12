@@ -76,7 +76,7 @@ $ cd benchmarks/motivational
 $ make clean && make
 ```
 
-Four binary files (test\_motivational\_case1, test\_motivational\_case2, test\_motivational\_case1_bcoz, test\_motivational\_case2_bcoz) are generated after make. The two binaries without '\_coz' can be run directly (i.e., ./test\_motivational\_case1), and you should verify that each behaves the same as in Figure 1 in the paper. We've added print some text before the two threads enter *barrier()*. When running test\_motivational\_case1, thread 1's print should come first in every iteration, and vice versa when running test\_motivational\_case2. 
+Four binary files (test\_motivational\_case1, test\_motivational\_case2, test\_motivational\_case1\_bcoz, test\_motivational\_case2\_bcoz) are generated after make. The two binaries without '\_coz' can be run directly (i.e., ./test\_motivational\_case1), and you should verify that each behaves the same as in Figure 1 in the paper. We've added print some text before the two threads enter *barrier()*. When running test\_motivational\_case1, thread 1's print should come first in every iteration, and vice versa when running test\_motivational\_case2. 
 
 ```bash
 [test_motivational_test1]
@@ -172,13 +172,41 @@ $ mv db_bench db_bench_bcoz
 
 **Note**: Built static libraries are removed with `$ make clean`. Please backup these libraries and copy at making db\_bench. We modified Makefile to add compile flags needed for generating debug information and preserving frame pointers, as well as linking static libraries.
 
-#### 5-2-2. RocksDB-*prefix\_dist*
+#### 5-2-2. Data loading
 
+```bash
+$ ./db_bench_perf --threads=16 --bloom_bits=10 --num=$((1024*1024*1024)) --key_size=48 --value_size=43 --cache_size=$((10*1024*1024*1024)) \
+--use_direct_reads=true --use_direct_io_for_flush_and_compaction=true --ttl_seconds=$((60*60*24*30*12)) --partition_index=true \
+--partition_index_and_filters=true --db=${dbdir} --use_existing_db=false --max_write_buffer_number=16 --compression_type=none \
+--max_background_compactions=2 --benchmarks=filluniquerandom
+```
 
+#### 5-2-3. RocksDB-*prefix\_dist*
 
-#### 5-2-3. RocksDB-*allrandom*
+```bash
+./db_bench_perf --threads=8 --cache_index_and_filter_blocks=true --bloom_bits=10 --partition_index=true --partition_index_and_filters=true \
+--num=$((1024*1024*1024)) --reads=$((1024*1024)) --use_direct_reads=true --key_size=48 --value_size=43  --cache_numshardbits=${shard_bits} --db=${dbdir} \
+--use_existing_db=1 --cache_size=$((10*1024*1024*1024)) --benchmarks=mixgraph --key_dist_a=0.002312 --key_dist_b=0.3467 --keyrange_dist_a=14.18 \
+--keyrange_dist_b=-2.917 --keyrange_dist_c=0.0164 --keyrange_dist_d=-0.08082 --keyrange_num=30 --mix_get_ratio=1 --mix_put_ratio=0 --mix_seek_ratio=0 \
+--value_k=0.2615 --value_sigma=25.45 --iter_k=2.517 --iter_sigma=14.236  --sine_mix_rate_interval_milliseconds=5000 --sine_a=1000 --sine_b=0.000073 \
+--sine_d=4500
+```
 
-#### 5-2-4. RocksDB-*fillrandom*
+#### 5-2-4. RocksDB-*allrandom*
+
+```bash
+./db_bench_perf --threads=8 --cache_index_and_filter_blocks=true --bloom_bits=10 --partition_index=true --partition_index_and_filters=true \
+--num=$((1024*1024*1024)) --reads=$((1024*1024)) --use_direct_reads=true --key_size=48 --value_size=43  --cache_numshardbits=-1 --db=${dbdir} \
+--use_existing_db=1 --cache_size=$((128*1024*1024)) --benchmarks=mixgraph --keyrange_num=1 --value_k=0.2615 --value_sigma=25.45 --iter_k=2.517 \
+--iter_sigma=14.236 --mix_get_ratio=1 --mix_put_ratio=0 --mix_seek_ratio=0 --sine_mix_rate_interval_milliseconds=5000 --sine_a=1000 --sine_b=0.000073 \
+--sine_d=4500
+```
+
+#### 5-2-5. RocksDB-*fillrandom*
+
+```bash
+./db_bench_perf --threads=16 --bloom_bits=10 --num=$((10*1024*1024)) --key_size=48 --value_size=43 --cache_size=$((10*1024*1024*1024)) \ --use_direct_reads=true --use_direct_io_for_flush_and_compaction=true --ttl_seconds=$((60*60*24*30*12)) --partition_index=true \ --partition_index_and_filters=true --db=${dbdir} --use_existing_db=false --max_write_buffer_number=2 --max_background_compactions=2 \ --benchmarks=fillrandom
+```
 
 ### 5-3. NPB
 
@@ -204,21 +232,28 @@ $ cd bin; mv is.C.x is.C.x_bcoz; cd ..
 [Run IS with 32 openmp threads]
 $ export OMP_NUM_THREADS=32
 
-[Run IS with BCOZ (default run)]
+[Run IS with BCOZ (default run) -> Figure 15a]
 $ for((i=0;i<5;i++)); do sleep 2; taskset -c 0 bcoz run --- ./bin/is.C.x_bcoz; done
 $ mv profile.coz profile_line-level.coz
 
-[Run IS with BCOZ (specifying offcpu subclass)]
+[Run IS with BCOZ (specifying offcpu subclass) -> Figure 15b]
+[# cores=1]
 $ for((i=0;i<5;i++)); do sleep 2; taskset -c 0 bcoz run --blocked-scope s --- ./bin/is.C.x_bcoz; done
+[# cores=2]
 $ for((i=0;i<5;i++)); do sleep 2; taskset -c 0-1 bcoz run --blocked-scope s --- ./bin/is.C.x_bcoz; done
+[# cores=4]
 $ for((i=0;i<5;i++)); do sleep 2; taskset -c 0-3 bcoz run --blocked-scope s --- ./bin/is.C.x_bcoz; done
+[# cores=8]
 $ for((i=0;i<5;i++)); do sleep 2; taskset -c 0-7 bcoz run --blocked-scope s --- ./bin/is.C.x_bcoz; done
+[# cores=16]
 $ for((i=0;i<5;i++)); do sleep 2; taskset -c 0-15 bcoz run --blocked-scope s --- ./bin/is.C.x_bcoz; done
+[# cores=32]
 $ for((i=0;i<5;i++)); do sleep 2; taskset -c 0-31 bcoz run --blocked-scope s --- ./bin/is.C.x_bcoz; done
+
 $ mv profile.coz profile_subclass-level.coz
 ```
 
-Load the generated '.coz' file into [plot](https://plasma-umass.org/coz/). Figure 15a and 15b are obtained from `profile_line-level.coz` and `profile\_subclass-level.coz`, respectively.
+Load the generated '.coz' file into [plot](https://plasma-umass.org/coz/). Figure 15a and 15b are obtained from `profile_line-level.coz` and `profile_subclass-level.coz`, respectively.
 
 To compare the virtual speedup results with actual speedup (Figure 15c), try to run `is.C.x_perf` without BCOZ.
 

@@ -44,6 +44,11 @@ $ apt-get install build-essential libncurses5 libncurses5-dev bin86 kernel-packa
 ```
 
 #### 1-2. Kernel configurations
+
+```bash
+$ make menuconfig
+```
+
 To profiling kernel debug information the following configurations should be set.
 
 ```bash
