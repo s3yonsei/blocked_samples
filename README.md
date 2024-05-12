@@ -141,7 +141,7 @@ export PATH=~/blocked_samples/blocked_samples/tools/perf:$PATH
 
 ```bash
 $ bperf record -g -e task-clock -c 1000000 --weight sleep 5
-...
+[ perf record: Woken up x times to write data ]
 [ perf record: Captured and wrote x MB perf.data (5000 samples) ]
 ```
 
@@ -156,7 +156,7 @@ Instructions for building BCOZ is not much different from original COZ. For the 
 
 ```bash
 $ apt-get update
-$ apt-get install libdwarf-dev
+$ apt-get install libdwarf-dev libelfin-dev
 $ apt-get install build-essential cmake docutils-common git python3 pkg-config
 $ apt-get install nodejs npm
 ```
@@ -164,7 +164,7 @@ $ apt-get install nodejs npm
 #### 4-2. Build BCOZ
 
 ```bash
-$ cd bcoz
+$ cd ~/blocked_samples/bcoz
 $ make clean && make
 $ make install
 ```
@@ -172,7 +172,7 @@ $ make install
 #### 4-3. Set environment variable
 
 ```bash
-export PATH=[path/to/bcoz]:$PATH
+export PATH=~/blocked_samples/bcoz:$PATH
 ```
 
 #### 4-4. Change 'perf\_event\_paranoid'
@@ -290,6 +290,7 @@ test\_io\_coz.c is same with test\_io.c except for the progress point in line 87
 We provided Makefile inside of the simple\_test. Make sure that rpath and dynamic-linker are appropriate.
 
 ```bash
+$ cd ~/blocked_samples/blocked_samples/osdi_24/benchmarks/simple_test
 $ make clean && make
 ```
 
