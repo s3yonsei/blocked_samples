@@ -6,11 +6,9 @@
 
 For the detailed description, please refer to the paper:
 
-**Identifying On-/Off-CPU Bottlenecks Together with Blocked Samples**.
+**Identifying On-/Off-CPU Bottlenecks Together with Blocked Samples**, Minwoo Ahn, Jeongmin Han, Youngjin Kwon, Jinkyu Jeong. *The 18th USENIX Symposium on Operating Systems Design and Implementation (OSDI'24)*, Santa Clara, CA, US, July 10-12, 2024
 
-Author: Minwoo Ahn, Jeongmin Han, Youngjin Kwon, Jinkyu Jeong. *18th USENIX Symposium on Operating Systems Design and Implementation (OSDI'24)*.
-
-Contact: Minwoo Ahn (mwahn402@gmail.com), Jinkyu Jeong (jinkyu@yonsei.ac.kr)
+Contact: Minwoo Ahn (mwahn402@gmail.com), [Jinkyu Jeong](https://cslab.yonsei.ac.kr) (jinkyu@yonsei.ac.kr)
 
 ## About Repository
 This repository consists of three subdirectories: bcoz (source code of BCOZ), blocked\_samples (source code of Linux kernel with bperf), osdi24\_ae (OSDI'24 artifacts evaluation).
