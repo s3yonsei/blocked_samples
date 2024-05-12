@@ -12,9 +12,9 @@ SHELL := $(shell which bash)
 include python.mk
 
 CLEAN_FILES = # deliberately empty, so we can append below.
-EXTRA_CFLAGS += -Wno-error=unused-function #-g -gdwarf-3 -fno-omit-frame-pointer -O3 -Wl,--no-as-needed -ldl -lpthread -Wl,--rpath=/usr/local/lib/glibc-testing-2.30 -Wl,--dynamic-linker=/trusted/local/lib/glibc-testing-2.30/lib/ld-linux.so.2 -L./
-EXTRA_CXXFLAGS += -Wno-error=unused-function #-g -gdwarf-3 -fno-omit-frame-pointer -O3 -Wl,--no-as-needed -ldl -lpthread -Wl,--rpath=/usr/local/lib/glibc-testing-2.30 -Wl,--dynamic-linker=/trusted/local/lib/glibc-testing-2.30/lib/ld-linux.so.2 -L./ -Wno-error=unused-function
-EXTRA_LDFLAGS += -Wno-error=unused-function #-Wl,--no-as-needed -ldl -lpthread -Wl,--rpath=/usr/local/lib/glibc-testing-2.30 -Wl,--dynamic-linker=/trusted/local/lib/glibc-testing-2.30/lib/ld-linux.so.2 -L./
+EXTRA_CFLAGS += -Wno-error=unused-function -g -gdwarf-4 -fno-omit-frame-pointer -O3 -Wl,--no-as-needed -ldl -lpthread -Wl,--rpath=/usr/local/lib/glibc-testing -Wl,--dynamic-linker=/trusted/local/lib/glibc-testing/lib/ld-linux.so.2 -L./
+EXTRA_CXXFLAGS += -Wno-error=unused-function -g -gdwarf-4 -fno-omit-frame-pointer -O3 -Wl,--no-as-needed -ldl -lpthread -Wl,--rpath=/usr/local/lib/glibc-testing -Wl,--dynamic-linker=/trusted/local/lib/glibc-testing/lib/ld-linux.so.2 -L./
+EXTRA_LDFLAGS += -Wno-error=unused-function -Wl,--no-as-needed -ldl -lpthread -Wl,--rpath=/usr/local/lib/glibc-testing -Wl,--dynamic-linker=/trusted/local/lib/glibc-testing/lib/ld-linux.so.2 -L./
 
 CFLAGS += ${EXTRA_CFLAGS}
 CXXFLAGS += ${EXTRA_CXXFLAGS}

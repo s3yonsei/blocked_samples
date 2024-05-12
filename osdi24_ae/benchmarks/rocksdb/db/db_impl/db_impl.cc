@@ -1739,7 +1739,7 @@ Status DBImpl::GetImpl(const ReadOptions& read_options, const Slice& key,
          get_impl_options.merge_operands != nullptr);
 
   assert(get_impl_options.column_family);
-  //COZ_PROGRESS;
+  COZ_PROGRESS;
   if (read_options.timestamp) {
     const Status s = FailIfTsSizesMismatch(get_impl_options.column_family,
                                            *(read_options.timestamp));
