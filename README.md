@@ -130,16 +130,11 @@ $ sudo apt-get install libdw-dev systemtap-sdt-dev libunwind-dev libslang2-dev l
 $ cd ~/blocked_samples/blocked_samples/tools/perf
 $ sudo make clean && sudo make
 $ sudo mv perf bperf
+$ sudo cp bperf /usr/bin
 $ sudo sh -c 'echo 0 > /proc/sys/kernel/kptr_restrict'
 ```
 
-#### 3-3. Set environment variable
-
-```bash
-$ export PATH=~/blocked_samples/blocked_samples/tools/perf:$PATH
-```
-
-#### 3-4. Simple test for bperf
+#### 3-3. Simple test for bperf
 
 ```bash
 $ bperf record -g -e task-clock -c 1000000 --weight sleep 5
@@ -169,15 +164,10 @@ $ sudo apt-get install nodejs npm
 $ cd ~/blocked_samples/bcoz
 $ make clean && make
 $ sudo make install
+$ sudo cp bcoz /usr/bin
 ```
 
-#### 4-3. Set environment variable
-
-```bash
-$ export PATH=~/blocked_samples/bcoz:$PATH
-```
-
-#### 4-4. Change 'perf\_event\_paranoid'
+#### 4-3. Change 'perf\_event\_paranoid'
 
 ```bash
 $ sudo sh -c 'echo 1 > /proc/sys/kernel/perf_event_paranoid'
