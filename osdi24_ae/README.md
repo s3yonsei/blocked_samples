@@ -102,15 +102,10 @@ If your execution does not prints as above, you should adjust the amount of *com
 
 #### 5-1-2. bperf
 
-Figure 7 is obtained by sampling case 1 using bperf. To obtain the sampling results of individual threads, you need to record using bperf by specifying the tid.
+Figure 7 is obtained by sampling case 1 using bperf. To obtain the sampling results of individual threads, you need to record using bperf by specifying the tid. To get the results in Figure 7, run the `motivational.sh` script.
 
 ```bash
-[Run application]
-$ ./test_motivational_case1
-
-[Assume that tid of thread 1 is t1 and thread 2 is t2. You can figure out tids simply using tools such as htop.]
-$ bperf record -o perf_t1.data -g -e task-clock -c 1000000 --weight --tid=t1 &
-$ bperf record -o perf_t2.data -g -e task-clock -c 1000000 --weight --tid=t2 &
+$ ./motivational.sh
 ```
 
 When the application finished, the recording also finished. You can report the sampling results as follows.
