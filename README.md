@@ -44,8 +44,8 @@ The process of building the Linux kernel is as follows.
 Before building the kernel, ensure the following packages are installed.
 
 ```bash
-$ apt-get update
-$ apt-get install build-essential libncurses5 libncurses5-dev bin86 kernel-package libssl-dev bison flex libelf-dev dwarves
+$ sudo apt-get update
+$ sudo apt-get install build-essential libncurses5 libncurses5-dev bin86 kernel-package libssl-dev bison flex libelf-dev dwarves
 ```
 
 #### 1-2. Kernel configurations
@@ -106,14 +106,14 @@ $ cd glibc-build
 $ ../glibc-2.30/configure --prefix=/usr/local/lib/glibc-testing --with-tls --enable-add-ons=nptl --enable-cet CFLAGS='-O3 -g -gdwarf-4 -fno-omit-frame-pointer' CXXFLAGS='-O3 -g -gdwarf-4 -fno-omit-frame-pointer' CPPFLAGS='-O3 -g -gdwarf-4 -fno-omit-frame-pointer'
 
 [make and install]
-$ make
-$ make install
+$ sudo make
+$ sudo make install
 
 [Install dynamic loader]
-$ mkdir -p /trusted/local/lib/glibc-testing/lib
+$ sudo mkdir -p /trusted/local/lib/glibc-testing/lib
 $ cd /trusted/local/lib/glibc-testing/lib
-$ cp /usr/local/lib/glibc-testing/lib/ld-2.30.so ./
-$ ln -s ld-2.30.so ld-linux.so.2
+$ sudo cp /usr/local/lib/glibc-testing/lib/ld-2.30.so ./
+$ sudo ln -s ld-2.30.so ld-linux.so.2
 ```
 
 ### 3. bperf build
@@ -122,8 +122,8 @@ $ ln -s ld-2.30.so ld-linux.so.2
 To enable features of Linux perf tool, following packages are needed.
 
 ```bash
-$ apt-get update
-$ apt-get install libdw-dev systemtap-sdt-dev libunwind-dev libslang2-dev libgtk2.0-dev libperl-dev python-dev binutils-dev libiberty-dev liblzma-dev libzstd-dev libnuma-dev libbabeltrace-ctf-dev libaudit-dev
+$ sudo apt-get update
+$ sudo apt-get install libdw-dev systemtap-sdt-dev libunwind-dev libslang2-dev libgtk2.0-dev libperl-dev python-dev binutils-dev libiberty-dev liblzma-dev libzstd-dev libnuma-dev libbabeltrace-ctf-dev libaudit-dev
 ```
 
 #### 3-2. Build bperf source code
@@ -131,6 +131,7 @@ $ apt-get install libdw-dev systemtap-sdt-dev libunwind-dev libslang2-dev libgtk
 $ cd ~/blocked_samples/blocked_samples/tools/perf
 $ sudo make clean && sudo make
 $ sudo mv perf bperf
+$ sudo sh -c 'echo 0 > /proc/sys/kernel/kptr_restrict'
 ```
 
 #### 3-3. Set environment variable
@@ -157,10 +158,10 @@ Instructions for building BCOZ is not much different from original COZ. For the 
 #### 4-1. Install packages
 
 ```bash
-$ apt-get update
-$ apt-get install libdwarf-dev libelfin-dev
-$ apt-get install build-essential cmake docutils-common git python3 pkg-config
-$ apt-get install nodejs npm
+$ sudo apt-get update
+$ sudo apt-get install libdwarf-dev libelfin-dev
+$ sudo apt-get install build-essential cmake docutils-common git python3 pkg-config
+$ sudo apt-get install nodejs npm
 ```
 
 #### 4-2. Build BCOZ
@@ -168,7 +169,7 @@ $ apt-get install nodejs npm
 ```bash
 $ cd ~/blocked_samples/bcoz
 $ make clean && make
-$ make install
+$ sudo make install
 ```
 
 #### 4-3. Set environment variable
@@ -196,6 +197,8 @@ To profile the application with bperf and BCOZ, additional compile flags are nee
 * '-g -gdwarf-4' is for debug information. Especially, gdwarf-4 is needed for BCOZ (and COZ).
 * '-fno-omit-frame-pointer' is for preserve frame pointer.
 * '-Wl,--no-as-needed -ldl -Wl,--rpath=/usr/local/lib/glibc-testing/lib' is for use newly built glibc library. *rpath* and *dynamic-linker* are directories of newly built glibc and dynamic loader in [glibc build](#2-glibc-build), respectively. If you followed instructions in part 2, you can use as written above.
+
+**Note**: When you compile and run your application as above, you may get an error that some shared libraries are not found, even though they exist. In this case, find the location of shared library by using `$ locate` and copying it to `/usr/local/lib/glibc-testing/lib`.
 
 #### 5-2. bperf
 
@@ -292,7 +295,7 @@ test\_io\_coz.c is same with test\_io.c except for the progress point in line 87
 We provided Makefile inside of the simple\_test. Make sure that rpath and dynamic-linker are appropriate.
 
 ```bash
-$ cd ~/blocked_samples/blocked_samples/osdi_24/benchmarks/simple_test
+$ cd ~/blocked_samples/benchmarks/simple_test
 $ make clean && make
 ```
 
@@ -320,7 +323,9 @@ $ bperf report -i perf_weight.data --no-children
 
 ##### 5-4-2. BCOZ
 
-The run below will generate a profile.coz file. Note that, as you run it repeatedly, the profile.coz will accumulate virtual speedup results, allowing you to see more causal profiling results.
+
+
+The instructions below will generate a profile.coz file. Note that, as you run it repeatedly, the profile.coz will accumulate virtual speedup results, allowing you to see more causal profiling results.
 
 ```bash
 [Default run]

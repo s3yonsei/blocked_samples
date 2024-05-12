@@ -8,9 +8,9 @@ update-gh-pages:: all
 	@git push origin `git subtree split --prefix viewer master 2> /dev/null`:gh-pages
 
 install:: all
-	@echo $(LOG_PREFIX) Installing coz to prefix $(prefix) $(LOG_SUFFIX)
+	@echo $(LOG_PREFIX) Installing bcoz to prefix $(prefix) $(LOG_SUFFIX)
 	@sed 's@destdir@"${DESTDIR}${prefix}"@g' coz-profilerConfig.cmake.in > coz-profilerConfig.cmake
-	@$(INSTALL) -D coz $(DESTDIR)$(bindir)/coz
+	@$(INSTALL) -D bcoz $(DESTDIR)$(bindir)/coz
 	@$(INSTALL) -D coz-profilerConfig.cmake $(DESTDIR)$(pkglibdir)/coz-profilerConfig.cmake
 	@$(INSTALL) -D libcoz/libcoz.so $(DESTDIR)$(pkglibdir)/libcoz.so
 	@$(INSTALL) -D include/coz.h $(DESTDIR)$(incdir)/coz.h
