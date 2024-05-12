@@ -321,7 +321,14 @@ $ bperf report -i perf_weight.data --no-children
 
 ##### 5-4-2. BCOZ
 
+As mentioned in [Profiling with blocked samples](#5-profiling-with-blocked-samples), some shared libraries should copied to `/usr/local/lib/glibc-testing/lib`.
 
+```bash
+cp /usr/lib/x86_64-linux-gnu/libdwarf++.so.0 /usr/local/lib/glibc-testing/lib
+cp /usr/lib/x86_64-linux-gnu/libelf++.so.0 /usr/local/lib/glibc-testing/lib
+cp /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /usr/local/lib/glibc-testing/lib
+cp /usr/lib/x86_64-linux-gnu/libgcc_s.so.1 /usr/local/lib/glibc-testing/lib
+```
 
 The instructions below will generate a profile.coz file. Note that, as you run it repeatedly, the profile.coz will accumulate virtual speedup results, allowing you to see more causal profiling results.
 
