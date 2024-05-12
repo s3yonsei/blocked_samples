@@ -31,7 +31,7 @@ We recommend that follow the instructions below after you complete the [Getting 
 
 ## 2. Artifacts components
 
-Blocked samples is consists of two main components: Linux perf subsystem (Linux kernel), and BCOZ source codes (bperf is included in Linux kernel). Both are maintained in *bcoz* and *blocked\_samples* directories in this repository, respectively (https://github.com/s3yonsei/blocked_samples).
+Blocked samples is consists of the two main components: Linux kernel for blocked samples (bperf is included), and BCOZ source code. Both are maintained in *blocked_samples* and *bcoz* directories in this repository, respectively (https://github.com/s3yonsei/blocked_samples).
 
 ## 3. Configurations
 
