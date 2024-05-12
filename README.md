@@ -24,7 +24,7 @@ This directory includes source code of BCOZ. BCOZ is a causal profiler that leve
 This directory includes extended Linux perf subsystem for blocked samples. Blocked samples is a profiling technique based on sampling, that encompasses both on- and off-CPU events simultaneously. Furthermore, the original Linux perf tool is replaced with bperf (blocked\_samples/tools/perf).
 
 ### benchmarks
-This directory includes profiling example with BCOZ.
+This directory includes example benchmarks with BCOZ.
 
 ### osdi24\_ae
 This directory is for OSDI'24 artifacts evaluation. It includes instructions for reproducing experimental results in the paper.
