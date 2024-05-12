@@ -5,7 +5,7 @@
 
 Author: Minwoo Ahn, Jeongmin Han, Youngjin Kwon, Jinkyu Jeong
 
-Contact: Minwoo Ahn (mwahn402@gmail.com), Jinkyu Jeong (jinkyu@yonsei.ac.kr)
+Contact: Minwoo Ahn (mwahn402@gmail.com), [Jinkyu Jeong](https://cslab.yonsei.ac.kr) (jinkyu@yonsei.ac.kr)
 
 ## Contents
 1. [Introduction](#1-introduction)
