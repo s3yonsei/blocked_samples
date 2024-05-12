@@ -338,12 +338,6 @@ Off-CPU events' subclass is denoted in symbol section, inside the square bracket
 
 BCOZ shows virtual speedup results results for lines of application code that contain off-CPU events. The first figure shows the performance improvement estimates for improving blocking I/O only (fixed-subclass run), and the next two figures show the performance improvement estimates for improving *fsync()* calls contained in *io\_heavy()* and *io\_light()*, respectively. Note that, the behavior of *fsync()* shows higher virtual speedup results because it inclues on-CPU events from the application-level to the kernel I/O stack and off-CPU events corresponding to blocking I/O. Also, the virutal speedup result for *fsync()* with *io\_heavy()* is higher than with *io\_light()*.
 
-## License
-
-Copyright for blocked samples is held by the Minwoo Ahn (Sungkyunkwan Univ.) and Jinkyu Jeong (Yonsei Univ.). Please contact us if you would like to obtain a license to use blocked samples in your commercial system.
-
-BCOZ and bperf are built on top of original COZ and Linux perf tool, respectively, which are licensed seperately. For detailed license information, please refer to the license in *bcoz* and *blocked\_samples* directories.
-
 ## Contributors
 
 * Minwoo Ahn, Sungkyunkwan Univ.
