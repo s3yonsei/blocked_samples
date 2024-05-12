@@ -359,14 +359,10 @@ To conclude, our blocked samples enables the identification of application bottl
 
 We hope that our blocked samples technique, as well as bperf and BCOZ, will help you identify bottlenecks in your application!
 
-## Contributors
+## Contacts
 
 * Minwoo Ahn, Jinkyu Jeong, [Scalable Systems Software Lab](https://cslab.yonsei.ac.kr), Yonsei University, South Korea
-
-## Acknowledgements
-
-TBU.
-
-## Contact
-
 Please contact us at `mwahn402@gmail.com` or `jinkyu@yonsei.ac.kr` with any questions.
+
+
+
