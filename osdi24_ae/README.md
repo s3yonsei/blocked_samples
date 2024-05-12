@@ -134,13 +134,8 @@ Load the generated `.coz` files (profile\_case1.coz and profile\_case2.coz) into
 
 Although the reported results and the Figure 9 may differ in details, you should be able to figure out the followings.
 
-* `Case 1`
-1. There is no performance gain from optimizing I/O events (*pread*, *pwrite*, and I/O subclass).
-2. Only *compute\_heavy* function have performance gain from optimization.
-
-* `Case 2`
-1. There is no performance gain from optimizing *compute\_heavy* function.
-2. There are performance gain from optimizing *pread*, *pwrite*, and I/O subclass.
+* `Case 1` - There is no performance gain from optimizing I/O events (*pread*, *pwrite*, and I/O subclass) and only *compute\_heavy* function have performance gain from optimization.
+* `Case 2` - There is no performance gain from optimizing *compute\_heavy* function and there are performance gain from optimizing *pread*, *pwrite*, and I/O subclass.
 
 ### 5-3. RocksDB
 
