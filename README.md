@@ -7,11 +7,12 @@
 For the detailed description, please refer to the paper:
 
 **Identifying On-/Off-CPU Bottlenecks Together with Blocked Samples**, Minwoo Ahn, Jeongmin Han, Youngjin Kwon, Jinkyu Jeong. *The 18th USENIX Symposium on Operating Systems Design and Implementation (OSDI'24)*, Santa Clara, CA, US, July 10-12, 2024
+
 **Contacts**: Please contact us if you have any questions. [Minwoo Ahn](mailto:mwahn402@gmail.com), [Jinkyu Jeong](mailto:jinkyu@yonsei.ac.kr), [Scalable Systems Software Lab](https://cslab.yonsei.ac.kr), Yonsei University, South Korea
 
 
 ## About Repository
-This repository consists of three subdirectories: bcoz (source code of BCOZ), blocked\_samples (source code of Linux kernel with bperf), osdi24\_ae (OSDI'24 artifacts evaluation).
+This repository consists of three subdirectories: bcoz (source code of BCOZ), blocked\_samples (source code of Linux kernel with bperf), benchmarks (profiling examples), and osdi24\_ae (OSDI'24 artifacts evaluation).
 
 Descriptions of each subdirectories are as follows.
 
@@ -354,13 +355,3 @@ Off-CPU events' subclass is denoted in symbol section, inside the square bracket
 <img src="https://github.com/s3yonsei/blocked_samples/blob/main/benchmarks/simple_test/example_results/example-bcoz.PNG " width="100%">
 
 BCOZ shows virtual speedup results results for lines of application code that contain off-CPU events. The first figure shows the performance improvement estimates for improving blocking I/O only (fixed-subclass run), and the next two figures show the performance improvement estimates for improving *fsync()* calls contained in *io\_heavy()* and *io\_light()*, respectively. Note that, the behavior of *fsync()* shows higher virtual speedup results because it inclues on-CPU events from the application-level to the kernel I/O stack and off-CPU events corresponding to blocking I/O. Also, the virutal speedup result for *fsync()* with *io\_heavy()* is higher than with *io\_light()*.
-
-## Conclusion
-
-To conclude, our blocked samples enables the identification of application bottlenecks by integrating on- and off-CPU events simultaneously within the same dimension. We preset bperf, a Linux perf tool that utilizes the proposed blocked samples to identify application bottlenecks based on event execution time, and BCOZ, a causal profiler that offers a virtual speedup for both on- and off-CPU evnets.
-
-We hope that our blocked samples technique, as well as bperf and BCOZ, will help you identify bottlenecks in your application!
-
-
-
-
