@@ -7,6 +7,9 @@
 For the detailed description, please refer to the paper:
 
 **Identifying On-/Off-CPU Bottlenecks Together with Blocked Samples**, Minwoo Ahn, Jeongmin Han, Youngjin Kwon, Jinkyu Jeong. *The 18th USENIX Symposium on Operating Systems Design and Implementation (OSDI'24)*, Santa Clara, CA, US, July 10-12, 2024
+* Contacts: Minwoo Ahn, Jinkyu Jeong, [Scalable Systems Software Lab](https://cslab.yonsei.ac.kr), Yonsei University, South Korea
+Please contact us at `mwahn402@gmail.com` or `jinkyu@yonsei.ac.kr` with any questions.
+
 
 ## About Repository
 This repository consists of three subdirectories: bcoz (source code of BCOZ), blocked\_samples (source code of Linux kernel with bperf), osdi24\_ae (OSDI'24 artifacts evaluation).
@@ -359,10 +362,6 @@ To conclude, our blocked samples enables the identification of application bottl
 
 We hope that our blocked samples technique, as well as bperf and BCOZ, will help you identify bottlenecks in your application!
 
-## Contacts
-
-* Minwoo Ahn, Jinkyu Jeong, [Scalable Systems Software Lab](https://cslab.yonsei.ac.kr), Yonsei University, South Korea
-Please contact us at `mwahn402@gmail.com` or `jinkyu@yonsei.ac.kr` with any questions.
 
 
 
