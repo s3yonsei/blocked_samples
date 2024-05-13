@@ -5,7 +5,7 @@
 
 Author: Minwoo Ahn, Jeongmin Han, Youngjin Kwon, Jinkyu Jeong
 
-Contact: Minwoo Ahn (mwahn402@gmail.com), [Jinkyu Jeong](https://cslab.yonsei.ac.kr) (jinkyu@yonsei.ac.kr)
+**Contacts**: Please contact us if you have any questions. [Minwoo Ahn](mailto:mwahn402@gmail.com), [Jinkyu Jeong](mailto:jinkyu@yonsei.ac.kr), [Scalable Systems Software Lab](https://cslab.yonsei.ac.kr), Yonsei University, South Korea
 
 ## Contents
 1. [Introduction](#1-introduction)
@@ -17,9 +17,7 @@ Contact: Minwoo Ahn (mwahn402@gmail.com), [Jinkyu Jeong](https://cslab.yonsei.ac
 
 ## 1. Introduction
 
-This repository is for reproduce the experimental results presented in the paper published at OSDI'24. Our evaluations are consists of 'motivational', 'RocksDB (*prefix\_dist*, *allrandom*, *fillrandom*)', 'NPB (*integer sort*)', and 'overhead'.
-
-We recommend that follow the instructions below after you complete the [Getting Started with Blocked Samples](https://github.com/s3yonsei/blocked_samples/tree/main?tab=readme-ov-file#getting-started-with-blocked-samples).
+This repository is for reproducing the experimental results presented in the paper published at OSDI'24. Our evaluation consist of 'motivational', 'RocksDB (*prefix\_dist*, *allrandom*, *fillrandom*)', 'NPB (*integer sort*)', and 'overhead'.
 
 * #### Motivational - Figure 7, 9
 * #### RocksDB-*prefix\_dist* (Section 4.2 - Optimization 1) - Figure 10
@@ -31,7 +29,7 @@ We recommend that follow the instructions below after you complete the [Getting 
 
 ## 2. Artifacts components
 
-Blocked samples is consists of the two main components: Linux kernel for blocked samples (bperf is included), and BCOZ source code. Both are maintained in *blocked_samples* and *bcoz* directories in this repository, respectively (https://github.com/s3yonsei/blocked_samples).
+Blocked samples consist of two main components: the Linux kernel for blocked samples (which includes bperf), and BCOZ source code. Both are maintained in *blocked_samples* and *bcoz* directories in this repository, respectively (https://github.com/s3yonsei/blocked_samples).
 
 ## 3. Configurations
 
@@ -42,22 +40,22 @@ Blocked samples is consists of the two main components: Linux kernel for blocked
 | Memory        | DDR4 2933 MHz, 384 GB (32 GB x 12)  |
 | **OS**        | Ubuntu 20.04 Server |
 
-**Note**: To evaluate our artifacts, special hardware (high-end SSD that shows high IOPS and low-end SSD).The performance of the SSDs used in the RocksDB experiment can affect the profiling results. For example, the *prefix\_dist* experiment shows profiling results that emphasize the importance of optimizing block cache lock contention over optimizing I/O events in read-only workloads, but this can be reversed if the used SSD is slow.
+**Note**: To evaluate our artifacts, special hardwares are required (high-end SSD that shows high IOPS and low-end SSD).The performance of the SSDs used in the RocksDB experiment can affect the profiling results. For instance, the *prefix\_dist* experiment demonstrates profiling results that underscore the importance of optimizing block cache lock contention over optimizing I/O events in read-only workloads, but this may be reversed if a slow SSD is utilized.
 
-We have specified the SSDs we used for each experiment and recommend utilizing NVMe SSDs that are as close to the performance as possible. If this is not possible, we recommend utilizing two NVMe SSDs with different IOPS.
+We have specified the SSDs we used for each experiment and recommend using NVMe SSDs that closely match their performance. If this is not feasible, we suggest employing two NVMe SSDs with differing IOPS.
 
 
 ## 4. Getting Started Instructions
-Please follow the instructions in [Getting Started with Blocked Samples](https://github.com/s3yonsei/blocked_samples/tree/main?tab=readme-ov-file#getting-started-with-blocked-samples). Through this section, you can quickly check whether blocked samples functions correctly or not. Please contact us if you're having trouble with this process. 
+Please refer to the instructions in [Getting Started with Blocked Samples](https://github.com/s3yonsei/blocked_samples/tree/main?tab=readme-ov-file#getting-started-with-blocked-samples). This section will help you quickly verify whether blocked samples functions correctly. If you encounter any difficulties during this process, please contact us.
 
 ## 5. Detailed Instructions
 
 ### 5-1. Mount I/O devices
 
-Make sure that your device files (e.g., /dev/nvme0n1p1) are formatted with ext4 file system and mounted. Please mount your devices on `/media/nvme_slow` and `/media/nvme_fast`.
+Make sure that your device files (e.g., /dev/nvme0n1p1) are formatted with the ext4 file system and mounted. Please mount your devices at `/media/nvme_slow` and `/media/nvme_fast`.
 
 ```bash
-[Assume that the name of the device file of slower device is /dev/nvme0n1p1 and faster device is /dev/nvme1n1p1]
+[Assuming that the device file name for slower SSD is /dev/nvme0n1p1 and for the faster device is /dev/nvme1n1p1]
 $ mkfs -t ext4 /dev/nvme0n1p1
 $ mkfs -t ext4 /dev/nvme1n1p1
 
@@ -77,7 +75,8 @@ $ make clean && make
 $ cd ..
 ```
 
-Four binary files (test\_motivational\_case1, test\_motivational\_case2, test\_motivational\_case1\_bcoz, test\_motivational\_case2\_bcoz) are generated after make. The two binaries without '\_coz' can be executed directly (`$ ./test\_motivational\_case1`), and you should verify that each behaves the same as in Figure 1 in the paper. We've added print some text before the two threads enter *barrier()*. When running test\_motivational\_case1, thread 1's print should come first in every iteration, and vice versa when running test\_motivational\_case2. 
+Four binary files (test\_motivational\_case1, test\_motivational\_case2, test\_motivational\_case1\_bcoz, test\_motivational\_case2\_bcoz) are generated after make. The two binaries without '\_coz' can be executed directly (`$ ./test\_motivational\_case1`). You should verify that each behaves the same as illustrated in Figure 1 of the paper. We've included code to print some text before the two threads enter the *barrier()*. When running test\_motivational\_case1, thread 1's print should appear first in every iteration, and vice versa when running test\_motivational\_case2.
+
 
 ```bash
 [test_motivational_test1]
@@ -99,17 +98,17 @@ thread 1 iteration 3
 ...
 ```
 
-If your execution does not prints as above, you should adjust the amount of *compute\_heavy()* (line 56). Increasing the computation load moves thread 2 on the critical path (case 1) and decreasing moves thread 1 on the critical path (case 2).
+If your execution does not print as described above, you should adjust the amount of computation which *compute_heavy()* conducts (line 56). Increasing the computation load shifts thread 2 onto the critical path (case 1), while decreasing it shifts thread 1 onto the critical path (case 2).
 
 #### 5-2-2. bperf
 
-Figure 7 is obtained by sampling case 1 using bperf. To obtain the sampling results of individual threads, you need to record using bperf by specifying the tid. To get the results in Figure 7, run the `motivational_perf.sh` script.
+Figure 7 is obtained by sampling case 1 using bperf. To obtain the sampling results for individual threads, you need to record using bperf by specifying the tid. To generate the results shown in Figure 7, execute the `motivational_perf.sh` script.
 
 ```bash
 $ sudo ./motivational_perf.sh
 ```
 
-When the application finished, the recording also finished. You can report the sampling results as follows.
+When the application finishes, the recording also ends. You can report the sampling results as follows.
 
 ```bash
 [Thread 1 in case 1]
@@ -119,9 +118,10 @@ $ bperf report -i perf_t1.data --no-children
 $ bperf report -i perf_t2.data --no-children
 ```
 
-Although the reported results and the Figure 7 may differ in details, the off-CPU events corresponding to blocking I/O (**I** in the square brackets) for `__libc_pread64`, `__libc_pwrite`, and lock-waiting (**L** in the square brackets) for `pthread_cond_wait` should be reported.
+Although the reported results and Figure 7 may differ in details, the off-CPU events corresponding to blocking I/O (**I** in the square brackets) for `__libc_pread64', and `__libc_pwrite`, and lock-waiting (**L** in the square brackets) for `pthread_cond_wait` should be reported.
 
-**Note**: The sampling results of original Linux perf (Figure 2) can be obtained with same recording commands in the script, except for the name of the tool (bperf-\>perf). However, for a proper comparison with bperf's sampling results with bperf's, recording should be done after booting into a original Linux kernel rather than the Linux kernel for blocked samples.
+
+**Note**: If you want to campare perf's sampling results with bperf's, recording should be done after booting into a original Linux kernel rather than the Linux kernel for blocked samples.
 
 #### 5-2-3. BCOZ
 
