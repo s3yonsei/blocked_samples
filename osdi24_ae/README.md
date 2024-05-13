@@ -394,17 +394,29 @@ In this experiment, we compared the overhead of bperf with existing profiling te
 Figure 16 shows the performance drop (percent reduction in throughput or latency) and CPU cycle increase compared to the baseline. The profiling overhead can be calculated using the following profiling commands. Assume that the profiling target is a.out. Note that, with the exception of bperf, you must boot an original Linux kernel to make measurements.
 
 ```bash
-[Linux perf sampling (on-CPU only)]
-$ perf record -g -e task-clock -c 1000000 ./a.out
+[Baseline]
+$ cat /proc/stat > start_stat.txt
+$ ./a.out &> printed.txt
+$ cat /proc/stat > end_stat.txt
 
-[Linux perf tracing (off-CPU only)]
-$ perf record -g -e sched:sched_switch,sched:sched_wakeup -c 1 ./a.out
+[Overhead of profiling]
+$ cat /proc/stat > start_stat.txt
+$ ./a.out &> printed.txt &
+$ app=$!
+$ [Enter profiling command (see below)]
+$ wait ${app}
+$ cat /proc/stat > end_stat.txt
 
-[bperf sampling (both on- and off-CPU)]
-$ bperf record -g -e task-clock -c 1000000 --weight ./a.out
+[Profiling command]
+[1. Linux perf sampling (on-CPU only)]
+$ perf record -g -e task-clock -c 1000000 --pid=${app}
+[2. Linux perf tracing (off-CPU only)]
+$ perf record -g -e sched:sched_switch,sched:sched_wakeup -c 1 --pid=${app}
+[3. bperf sampling (both on- and off-CPU)]
+$ bperf record -g -e task-clock -c 1000000 --weight --pid=${app}
 ```
 
-Furthermore, to measure the additional CPU cycles (i.e., system-jiffies), we captured `/proc/stats` file before and after the executing of the application.
+Please refer to printed.txt to calculate performance drop. To measure the additional CPU cycles (i.e., system-jiffies), we captured `/proc/stats` file before and after the executing of the application. By calculating the difference between start\_stat.txt and end\_stat.txt, you can determine the additional CPU cycles consumption.
 
 ### 5-5-2. Overhead of BCOZ
 Figure 17 shows the overhead of profiling applications with BCOZ. The BCOZ overhead is categorized into three parts: `startup`, `sampling`, and `delays`. We have already incorporated code to distinguish between the three types of delays at the end of execution. Upon completing the profiling with BCOZ, the following line is printed to the terminal.
@@ -416,6 +428,4 @@ Overhead breakdown. Startup: xxxxxx real_main_time: yyyyyy end-to-end: zzzzzz
 You can calculate the overhead of BCOZ using the printed information.
 
 ### 5-5-3. Additional applications
-We measured additional 
-
-
+We measured additional applications, *NPB-ep* and *hackbench*, to cover on-CPU-intensive and off-CPU-intensive cases, respectively. The profiled application code for NPB-ep is located in `benchmarks/NPB/` and *hackbench* is located in `benchmarks/hackbench`.
