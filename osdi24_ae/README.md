@@ -386,4 +386,36 @@ $ ./npb_perf.sh
 **Note**: Figure 15c shows the actual performance improvement and virtual speedup results when the number of allocated cores is increased. The actual program speedup can be calculated from the throughput obtained by running `./npb_perf.sh`. If the throughput increased by a factor of X, the program speedup is (1-1/X) * 100 (%) (e.g., if X=4, the program speedup is 75%). The virtual speedup values in Figure 15c represent the program speedups for each plot in Figure 15b when the line speedup is 100%.
 
 ### 5-5. Overhead
- 
+
+In this experiment, we compared the overhead of bperf with existing profiling techniques: *tracing*, which profiles only off-CPU events (i.e., *sched_switch* and *sched_wakeup*) using Linux perf's tracing mode, and *sampling*, which samples only on-CPU events using Linux perf's sampling mode (i.e., *task-clock*). Furthermore, we measured the overhead of profiling application with BCOZ.
+
+### 5-5-1. Overhead of bperf
+
+Figure 16 shows the performance drop (percent reduction in throughput or latency) and CPU cycle increase compared to the baseline. The profiling overhead can be calculated using the following profiling commands. Assume that the profiling target is a.out. Note that, with the exception of bperf, you must boot an original Linux kernel to make measurements.
+
+```bash
+[Linux perf sampling (on-CPU only)]
+$ perf record -g -e task-clock -c 1000000 ./a.out
+
+[Linux perf tracing (off-CPU only)]
+$ perf record -g -e sched:sched_switch,sched:sched_wakeup -c 1 ./a.out
+
+[bperf sampling (both on- and off-CPU)]
+$ bperf record -g -e task-clock -c 1000000 --weight ./a.out
+```
+
+Furthermore, to measure the additional CPU cycles (i.e., system-jiffies), we captured `/proc/stats` file before and after the executing of the application.
+
+### 5-5-2. Overhead of BCOZ
+Figure 17 shows the overhead of profiling applications with BCOZ. The BCOZ overhead is categorized into three parts: `startup`, `sampling`, and `delays`. We have already incorporated code to distinguish between the three types of delays at the end of execution. Upon completing the profiling with BCOZ, the following line is printed to the terminal.
+
+```bash
+Overhead breakdown. Startup: xxxxxx real_main_time: yyyyyy end-to-end: zzzzzz
+```
+
+You can calculate the overhead of BCOZ using the printed information.
+
+### 5-5-3. Additional applications
+We measured additional 
+
+
