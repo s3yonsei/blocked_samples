@@ -1,6 +1,6 @@
 # OSDI'24 Artifacts Evaluation
 
-**Contacts**: Please contact us if you have any questions. [Minwoo Ahn](mailto:mwahn402@gmail.com), [Jinkyu Jeong](mailto:jinkyu@yonsei.ac.kr), [Scalable Systems Software Lab](https://cslab.yonsei.ac.kr), Yonsei University, South Korea
+Please contact us if you have any questions. [Minwoo Ahn](mailto:mwahn402@gmail.com), [Jinkyu Jeong](mailto:jinkyu@yonsei.ac.kr), [Scalable Systems Software Lab](https://cslab.yonsei.ac.kr), Yonsei University, South Korea
 
 ## Contents
 1. [Introduction](#1-introduction)
