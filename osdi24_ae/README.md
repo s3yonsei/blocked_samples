@@ -29,7 +29,7 @@ This repository is for reproducing the experimental results presented in the pap
 
 ## 2. Artifacts components
 
-Blocked samples consist of two main components: the Linux kernel for blocked samples (which includes bperf), and BCOZ source code. Both are maintained in *blocked_samples* and *bcoz* directories in this repository, respectively (https://github.com/s3yonsei/blocked_samples).
+Blocked samples consists of two main components: the Linux kernel for blocked samples (which includes bperf), and BCOZ source code. Both are maintained in *blocked_samples* and *bcoz* directories in this repository, respectively (https://github.com/s3yonsei/blocked_samples).
 
 ## 3. Configurations
 
@@ -121,7 +121,7 @@ $ bperf report -i perf_t2.data --no-children
 Although the reported results and Figure 7 may differ in details, the off-CPU events corresponding to blocking I/O (**I** in the square brackets) for `__libc_pread64', and `__libc_pwrite`, and lock-waiting (**L** in the square brackets) for `pthread_cond_wait` should be reported.
 
 
-**Note**: If you want to campare perf's sampling results with bperf's, recording should be done after booting into a original Linux kernel rather than the Linux kernel for blocked samples.
+**Note**: If you want to campare perf's sampling results with bperf's, recording should be done after booting into an original Linux kernel rather than the Linux kernel for blocked samples.
 
 #### 5-2-3. BCOZ
 
