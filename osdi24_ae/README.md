@@ -125,23 +125,23 @@ Although the reported results and Figure 7 may differ in details, the off-CPU ev
 
 #### 5-2-3. BCOZ
 
-Figure 9 is obtained by run BCOZ. We recommend that you run the application repeatedly to accumulate many virtual speedup results for accuracy. To get the results in Figure 9, run the `motivational_bcoz.sh` script.
+Figure 9 presents BCOZ's profiling results for the motivational example. We recommend running the application multiple times to accumulate numerous virtual speedup results for accuracy. To obtain the results shown in Figure 9, execute the `motivational_bcoz.sh` script.
 
 ```bash
 $ ./motivational_bcoz.sh
 ```
 Load the generated `.coz` files (profile\_case1.coz and profile\_case2.coz) into [plot](https://plasma-umass.org/coz/).
 
-**Note**: Although the reported results and the Figure 9 may differ in details, you should be able to figure out the followings.
+**Note**: While there may be differences in detail between the reported results and Figure 9, you should still be able to discern the following.
 
-* `Case 1` - There is no predicted performance gain from optimizing I/O events (*pread*, *pwrite*, and I/O subclass) and only *compute\_heavy* function have predicted performance gain from optimization.
-* `Case 2` - There is no predicted performance gain from optimizing *compute\_heavy* function and there are predicted performance gain from optimizing *pread*, *pwrite*, and I/O subclass.
+* `Case 1` - There is no predicted performance gain from optimizing I/O events (*pread*, *pwrite*, and I/O subclass), with only the *compute\_heavy* function showing a predicted performance gain from optimization.
+* `Case 2` - There is no predicted performance gain from optimizing *compute\_heavy* function, while and there are predicted performance gains from optimizing *pread*, *pwrite*, and I/O subclass.
 
 ### 5-3. RocksDB
 
 #### 5-3-1. Build
 
-Many libraries are dynamically loaded when running db\_bench. As explained in [glibc build](https://github.com/s3yonsei/blocked_samples/tree/main?tab=readme-ov-file#getting-started-with-blocked-samples), to obtain correct profiling results, the libraries should be rebuilt to do not omit frame pointers. In our experiments, rather than rebuilt them, we statically link libraries with execution binary.
+Many libraries are dynamically loaded when running db\_bench. As explained in [glibc build](https://github.com/s3yonsei/blocked_samples/tree/main?tab=readme-ov-file#getting-started-with-blocked-samples), to obtain correct profiling results, the libraries should be rebuilt to do not omit frame pointers. In our experiments, instead of rebuilding them all, we statically link some libraries with the execution binary.
 
 ```bash
 $ cd benchmarks/RocksDB
@@ -174,17 +174,17 @@ $ cp /lib/x86_64-linux-gnu/libgflags.so.2.2 /usr/local/lib/glibc-testing/lib
 
 #### 5-3-2. Data loading
 
-In experiments RocksDB-*prefix\_dist* and RocksDB-*allrandom*, we perform a read-only workload on the same dataset. Load 100GB of data on each SSD. Data load takes about 2~3 hours each with our SSDs.
+In experiments RocksDB-*prefix\_dist* and RocksDB-*allrandom*, we execute a read-only workload using the same dataset. We load 100GB of data onto each SSD (high-end and low-end). Loading the data takes around 2~3 hours with our SSDs.
 
 ```bash
-[Load data on fast ssd]
+[Load data on high-end ssd]
 $ ./db_bench_perf --threads=1 --bloom_bits=10 --num=$((1024*1024*1024)) --key_size=48 --value_size=43 \
 --cache_size=$((10*1024*1024*1024)) --use_direct_reads=true --use_direct_io_for_flush_and_compaction=true \
 --ttl_seconds=$((60*60*24*30*12)) --partition_index=true --partition_index_and_filters=true \
 --db=/media/nvme_fast/rocksdb_partitioned --use_existing_db=false --max_write_buffer_number=16 --compression_type=none \
 --max_background_compactions=2 --benchmarks=filluniquerandom
 
-[Load data on slow ssd]
+[Load data on low-end ssd]
 $ ./db_bench_perf --threads=1 --bloom_bits=10 --num=$((1024*1024*1024)) --key_size=48 --value_size=43 \
 --cache_size=$((10*1024*1024*1024)) --use_direct_reads=true --use_direct_io_for_flush_and_compaction=true \
 --ttl_seconds=$((60*60*24*30*12)) --partition_index=true --partition_index_and_filters=true \
@@ -192,7 +192,7 @@ $ ./db_bench_perf --threads=1 --bloom_bits=10 --num=$((1024*1024*1024)) --key_si
 --max_background_compactions=2 --benchmarks=filluniquerandom
 ```
 
-**Note**: Due to the data left in the memtable, compaction will occur once when you first run the workload. Execute a dummy run (not for performance measurement) once per dataset to ensure that compaction does not occur in subsequent read-only workload.
+**Note**: Because of the data retained in the memtable, compaction will occur initially when you start the workload. To prevent compaction from affecting subsequent read-only workloads, perform a dummy run (not intended for performance measurement) once for each dataset as follows.
 
 ```bash
 [Dummy run on dataset in fast ssd]
@@ -216,19 +216,19 @@ $ ./db_bench_perf --threads=1 --cache_index_and_filter_blocks=true --bloom_bits=
 
 #### 5-3-3. RocksDB-*prefix_dist*
 
-In this experiment, BCOZ identifies and address the bottleneck of block cache operations in a read-only workload. We profiled read-only execution of *prefix_dist*, an open-sourced real-world workload by Facebook. The number of shard is one to reproduce the well-known lock contention problem of RocksDB's LRU-based block cache.
+In this experiment, BCOZ identifies and addresses the bottleneck of block cache operations in a read-only workload. We profiled the read-only execution of *prefix_dist*, a real-world workload open-sourced by Facebook (i.e., Mixgraph). We set the number of shards to one to replicate the well-known lock contention problem of RocksDB's LRU-based block cache.
 
-Figure 12a is obtained by profiling with BCOZ.
+Figure 10a shows the profiling results for BCOZ. It can be reproduced with the following script.
 
 ```bash
 $ sudo ./rocksdb_1_bcoz.sh
 ```
 
-Load the generated profile.coz into [plot](https://plasma-umass.org/coz/).
+Load the generated profile.coz file into [plot](https://plasma-umass.org/coz/).
 
-**Note**: Although the reported results and the Figure 10a may differ in details, you should be able to figure out the predicted performance gain through optimizing lock contention (*GetDataBlockFromCache*) is larger than optimizing I/O event (*ReadBlockContents*). 
+**Note**: While there may be differences in detail between the reported results and Figure 10a, you should still be able to discern that the predicted performance gain from optimizing lock contention (*GetDataBlockFromCache*) is larger than that from optimizing I/O events (*ReadBlockContents*).
 
-Figure 10b is obtained by running `db_bench_perf` while adjusting options.
+Figure 10b shows the performance change after optimization. It can be reproduced with the following script.
 
 ```bash
 $ sudo ./rocksdb_1_performance.sh
@@ -250,8 +250,8 @@ $ ./db_bench_perf --threads=8 --cache_index_and_filter_blocks=true --bloom_bits=
 --sine_d=4500 --ttl_seconds=$((3600*24*365))
 ```
 
-* `SSD+`: change *db* to /media/nvme\_fast/rocksdb\_partitioned.
-* `Shard-X`: change *cache_numshardbits* from 0 to 1-6 (e.g., *cache_numshardbits* value of Shard-16 is 4).
+* `SSD+`: *db* is changed to /media/nvme\_fast/rocksdb\_partitioned.
+* `Shard-X`: *cache_numshardbits* is changed from 0 to 1-6. The number of the shards is 2^X.
 
 #### 5-3-4. RocksDB-*allrandom*
 
