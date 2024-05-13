@@ -428,4 +428,6 @@ Overhead breakdown. Startup: xxxxxx real_main_time: yyyyyy end-to-end: zzzzzz
 You can calculate the overhead of BCOZ using the printed information.
 
 ### 5-5-3. Additional applications
-We measured additional applications, *NPB-ep* and *hackbench*, to cover on-CPU-intensive and off-CPU-intensive cases, respectively. The profiled application code for NPB-ep is located in `benchmarks/NPB/` and *hackbench* is located in `benchmarks/hackbench`.
+We measured additional applications, *NPB-ep* and *hackbench*, to cover on-CPU-intensive and off-CPU-intensive cases, respectively. The profiled application code for NPB-ep is located in `benchmarks/NPB/` and *hackbench* is located in `benchmarks/hackbench`. We executed NPB-ep without CPU core restriction and hackbench with the command `./hackbench -s 512 -l 30000 -T`.
+
+
