@@ -338,13 +338,20 @@ The command for the baseline execution is as follows.
 --use_existing_db=false --benchmarks=fillrandom
 ```
 
-* `RamDisk`: *db* is changed to the directory that residing on the ramdisk.
+* `RamDisk`: --wal\_dir=/media/ramdisk is added to the command.
 * `no-WAL`: --disable\_wal=true is added to the command.
 * `Compress+`: --compress\_type=none is added to the command.
 * `Comp+`: the number of *max_background_compactions* is increased to 4
 * `Stall`: the number of *max_write_buffer_number* is increased to 16
 
-(**RamDisk**) 
+(**RamDisk**) To you RamDisk as a WAL device, please follow the instructions below.
+1. Add `ramdisk_size=8388608` (8GB) to the grub boot parameter in /etc/default/grub.
+2. Reboot.
+3. `$ modprobe brd rd_nr=1 rd_size=8388608 max_part=0`        -> /dev/ram0 is created.
+4. `$ dd if=/dev/zero of=/dev/ram0 bs=1M count=8192`
+5. `$ mkfs.ext4 /dev/ram0`
+6. `$ mkdir -p /media/ramdisk; mount -t ext4 /dev/ram0 /media/ramdisk`
+
 
 ### 5-4. NPB
 
