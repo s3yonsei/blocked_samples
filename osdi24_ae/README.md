@@ -1,8 +1,5 @@
 # OSDI'24 Artifacts Evaluation
 
-
-**Title: Identifying On-/Off-CPU Bottlenecks Together with Blocked Samples**, Minwoo Ahn, Jeongmin Han, Youngjin Kwon, Jinkyu Jeong. *The 18th USENIX Symposium on Operating Systems Design and Implementation (OSDI'24)*, Santa Clara, CA, US, July 10-12, 2024
-
 **Contacts**: Please contact us if you have any questions. [Minwoo Ahn](mailto:mwahn402@gmail.com), [Jinkyu Jeong](mailto:jinkyu@yonsei.ac.kr), [Scalable Systems Software Lab](https://cslab.yonsei.ac.kr), Yonsei University, South Korea
 
 ## Contents
