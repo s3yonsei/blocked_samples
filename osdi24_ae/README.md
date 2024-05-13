@@ -332,7 +332,7 @@ $ cat rocksdb_3.txt
 The command for the baseline execution is as follows.
 
 ```bash
-./db_bench_perf --threads=16 --bloom_bits=10 --num=$((10*1024*1024)) --key_size=48 --value_size=43 \
+./db_bench_perf --threads=16 --bloom_bits=10 --num=$((10*1024*1024)) --key_size=1000 --value_size=24 \
 --cache_size=$((10*1024*1024*1024)) --use_direct_reads=true --use_direct_io_for_flush_and_compaction=true \
 --ttl_seconds=$((60*60*24*30*12)) --partition_index=true --partition_index_and_filters=true --db=/media/nvme_fast/rocksdb_temp \
 --use_existing_db=false --benchmarks=fillrandom
@@ -398,7 +398,9 @@ In this experiment, we compared the overhead of bperf with existing profiling te
 
 ### 5-5-1. Overhead of bperf
 
-Figure 16 shows the performance drop (percent reduction in throughput or latency) and CPU cycle increase compared to the baseline. The profiling overhead can be calculated using the following profiling commands. Assume that the profiling target is a.out. Note that, with the exception of bperf, you must boot an original Linux kernel to make measurements.
+Figure 16 shows the performance drop (percent reduction in throughput or latency) and CPU cycle increase compared to the baseline. The profiling overhead can be calculated using the following profiling commands. Assume that the profiling target is a.out. 
+
+**Note**: with the exception of bperf, you must boot an original Linux kernel to make measurements.
 
 ```bash
 [Baseline]
@@ -436,5 +438,4 @@ You can calculate the overhead of BCOZ using the printed information.
 
 ### 5-5-3. Additional applications
 We measured additional applications, *NPB-ep* and *hackbench*, to cover on-CPU-intensive and off-CPU-intensive cases, respectively. The profiled application code for NPB-ep is located in `benchmarks/NPB/` and *hackbench* is located in `benchmarks/hackbench`. We executed NPB-ep without CPU core restriction and hackbench with the command `./hackbench -s 512 -l 30000 -T`.
-
 

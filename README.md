@@ -12,7 +12,7 @@ For the detailed description, please refer to the paper:
 
 
 ## About Repository
-This repository consists of three subdirectories: bcoz (source code of BCOZ), blocked\_samples (source code of Linux kernel with bperf), benchmarks (profiling examples), and osdi24\_ae (OSDI'24 artifacts evaluation).
+This repository consists of three subdirectories: bcoz (source code of BCOZ), blocked\_samples (source code of Linux kernel with bperf), and osdi24\_ae (OSDI'24 artifacts evaluation).
 
 Descriptions of each subdirectories are as follows.
 
@@ -21,9 +21,6 @@ This directory includes source code of BCOZ. BCOZ is a causal profiler that leve
 
 ### blocked\_samples
 This directory includes extended Linux perf subsystem for blocked samples. Blocked samples is a profiling technique based on sampling, that encompasses both on- and off-CPU events simultaneously. Furthermore, the original Linux perf tool is replaced with bperf (blocked\_samples/tools/perf).
-
-### benchmarks
-This directory includes example benchmarks with BCOZ.
 
 ### osdi24\_ae
 This directory is for OSDI'24 artifacts evaluation. It includes instructions for reproducing experimental results in the paper.

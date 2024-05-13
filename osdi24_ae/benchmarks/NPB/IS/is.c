@@ -720,7 +720,7 @@ void rank( int iteration )
     own indexes to determine how many of each there are: their
     individual population                                       */
         m = (i > 0)? bucket_ptrs[i-1] : 0;
-        for ( k = m; k < bucket_ptrs[i]; k++ ) {	COZ_PROGRESS;
+        for ( k = m; k < bucket_ptrs[i]; k++ ) {
             key_buff_ptr[key_buff_ptr2[k]]++;  /* Now they have individual key   */
 	}                               /* population                     */
 

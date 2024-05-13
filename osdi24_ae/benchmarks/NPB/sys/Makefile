@@ -13,7 +13,7 @@ all: setparams
 # was compiled and linked
 
 setparams: setparams.c ../config/make.def
-	$(UCC) ${CONVERTFLAG} -g -gdwarf-3 -fno-omit-frame-pointer -Wl,--no-as-needed -ldl -fopenmp -Wl,--rpath=/usr/local/lib/glibc-testing-2.30/lib -Wl,--dynamic-linker=/trusted/local/lib/glibc-testing-2.30/lib/ld-linux.so.2 -o setparams setparams.c
+	$(UCC) ${CONVERTFLAG} -g -gdwarf-4 -fno-omit-frame-pointer -Wl,--no-as-needed -ldl -fopenmp -Wl,--rpath=/usr/local/lib/glibc-testing/lib -Wl,--dynamic-linker=/trusted/local/lib/glibc-testing/lib/ld-linux.so.2 -o setparams setparams.c
 
 
 clean: 

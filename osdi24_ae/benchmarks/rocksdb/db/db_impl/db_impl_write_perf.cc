@@ -16,7 +16,7 @@
 #include "options/options_helper.h"
 #include "test_util/sync_point.h"
 #include "util/cast_util.h"
-#include "coz.h"
+
 namespace ROCKSDB_NAMESPACE {
 // Convenience methods
 Status DBImpl::Put(const WriteOptions& o, ColumnFamilyHandle* column_family,
@@ -105,7 +105,7 @@ void DBImpl::SetRecoverableStatePreReleaseCallback(
   recoverable_state_pre_release_callback_.reset(callback);
 }
 
-Status DBImpl::Write(const WriteOptions& write_options, WriteBatch* my_batch) { COZ_PROGRESS;
+Status DBImpl::Write(const WriteOptions& write_options, WriteBatch* my_batch) {
   return WriteImpl(write_options, my_batch, /*callback=*/nullptr,
                    /*log_used=*/nullptr);
 }
