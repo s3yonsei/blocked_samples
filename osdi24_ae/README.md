@@ -42,13 +42,13 @@ Blocked samples is consists of the two main components: Linux kernel for blocked
 | Memory        | DDR4 2933 MHz, 384 GB (32 GB x 12)  |
 | **OS**        | Ubuntu 20.04 Server |
 
-**Note**: To evaluate our artifacts, not all system configurations are mendatory. However, the performance of the SSD used in the RocksDB experiment can affect the profiling results. For example, the *prefix\_dist* experiment shows profiling results that emphasize the importance of optimizing block cache lock contention over optimizing I/O events in read-only workloads, but this can be reversed if the used SSD is slow.
+**Note**: To evaluate our artifacts, special hardware (high-end SSD that shows high IOPS and low-end SSD).The performance of the SSDs used in the RocksDB experiment can affect the profiling results. For example, the *prefix\_dist* experiment shows profiling results that emphasize the importance of optimizing block cache lock contention over optimizing I/O events in read-only workloads, but this can be reversed if the used SSD is slow.
 
-This is the our biggest concern for artifacts evaluation. We have specified the SSDs we used for each experiment and recommend utilizing NVMe SSDs that are as close to the performance as possible. If this is not possible, we recommend utilizing two NVMe SSDs with different performance.
+We have specified the SSDs we used for each experiment and recommend utilizing NVMe SSDs that are as close to the performance as possible. If this is not possible, we recommend utilizing two NVMe SSDs with different IOPS.
 
 
 ## 4. Getting Started Instructions
-Please follow the instructions in [Getting Started with Blocked Samples](https://github.com/s3yonsei/blocked_samples/tree/main?tab=readme-ov-file#getting-started-with-blocked-samples). 
+Please follow the instructions in [Getting Started with Blocked Samples](https://github.com/s3yonsei/blocked_samples/tree/main?tab=readme-ov-file#getting-started-with-blocked-samples). Through this section, you can quickly check whether blocked samples functions correctly or not. Please contact us if you're having trouble with this process. 
 
 ## 5. Detailed Instructions
 
@@ -267,7 +267,7 @@ Load the generated profile.coz into [plot](https://plasma-umass.org/coz/).
 
 **Note**: Although the reported results and the Figure 12a may differ in details, you should be able to figure out the predicted performance gain through optimizing blocking I/O events (I/O subclass in the figure) is high. Furthermore, predicted performance gain through optimizing filter block read (*GetFilterPartitionBlock*) is highest among the index and data block reads (*IndexBlockIter* and *DataBlockIter*, respectively).
 
-Figure 12b is obtained by comparing the result of baseline and optimized execution. Optimized RocksDB code is in rocksdb\_aio.
+Figure 12b is obtained by comparing the result of baseline and optimized execution. We opened our asynchronous I/O-enabled RocksDB code as an optimization, in rocksdb\_aio directory.
 
 ```bash
 $ cd ~
@@ -275,11 +275,8 @@ $ apt-get install libudev-dev libaio-dev
 $ git clone https://github.com/axboe/liburing.git
 $ cd liburing
 $ make && sudo make install
-$ cp liburing.h ../blocked_samples/osdi24_ae/benchmarks/rocksdb_aio/aio/
-$ cd ../blocked_samples/osdi24_ae/benchmarks/rocksdb
-
-
-$ cd ../rocksdb_aio
+$ cp liburing.h ~/blocked_samples/osdi24_ae/benchmarks/rocksdb_aio/aio/
+$ cd ~/blocked_samples/osdi24_ae/benchmarks/rocksdb_aio
 
 $ make libsnappy.a DEBUG_LEVEL=2 -j $(nproc)
 $ make libzstd.a DEBUG_LEVEL=2 -j $(nproc)
@@ -339,7 +336,7 @@ The command for the baseline execution is as follows.
 ```bash
 ./db_bench_perf --threads=16 --bloom_bits=10 --num=$((10*1024*1024)) --key_size=48 --value_size=43 \
 --cache_size=$((10*1024*1024*1024)) --use_direct_reads=true --use_direct_io_for_flush_and_compaction=true \
---ttl_seconds=$((60*60*24*30*12)) --partition_index=true --partition_index_and_filters=true --db=/media/nvme_fast/rocksdb_partitioned \
+--ttl_seconds=$((60*60*24*30*12)) --partition_index=true --partition_index_and_filters=true --db=/media/nvme_fast/rocksdb_temp \
 --use_existing_db=false --max_write_buffer_number=2 --max_background_compactions=1 --benchmarks=fillrandom
 ```
 
