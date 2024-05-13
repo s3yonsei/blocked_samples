@@ -34,7 +34,7 @@ Blocked samples consists of two main components: the Linux kernel for blocked sa
 | Memory        | DDR4 2933 MHz, 384 GB (32 GB x 12)  |
 | **OS**        | Ubuntu 20.04 Server |
 
-**Note**: To evaluate our artifacts, special hardwares are required (high-end SSD that shows high IOPS and low-end SSD).The performance of the SSDs used in the RocksDB experiment can affect the profiling results. For instance, the *prefix\_dist* experiment demonstrates profiling results that underscore the importance of optimizing block cache lock contention over optimizing I/O events in read-only workloads, but this may be reversed if a slow SSD is utilized.
+**Note**: To evaluate our artifacts, special hardwares are required (high-end SSD that shows high IOPS and low-end SSD).The performance of the SSDs used in the RocksDB experiment can affect the profiling results. For instance, the *prefix\_dist* experiment demonstrates profiling results that emphasize the importance of optimizing block cache lock contention over optimizing I/O events in read-only workloads, but this may be reversed if a slow SSD is utilized.
 
 We have specified the SSDs we used for each experiment and recommend using NVMe SSDs that closely match their performance. If this is not feasible, we suggest employing two NVMe SSDs with differing IOPS.
 
