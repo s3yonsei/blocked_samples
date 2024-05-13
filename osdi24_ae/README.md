@@ -255,19 +255,19 @@ $ ./db_bench_perf --threads=8 --cache_index_and_filter_blocks=true --bloom_bits=
 
 #### 5-3-4. RocksDB-*allrandom*
 
-In this experiment, BCOZ identifies and address the bottleneck where I/O events become a bottleneck as block cache lock contention is resovled. We profiled read-only execution of *allrandom*, an open-sourced real-world workload by Facebook. The size of the block cache is 128MB to incur a large amount of I/O events.
+In this experiment, BCOZ identifies and addresses the bottleneck where I/O events become a bottleneck once block cache lock contention is resovled. We profiled read-only execution of *allrandom*, a real-world workload open-sourced by Facebook. The size of the block cache is set to 128MB to increase the occurrence of I/O events.
 
-Figure 12a is obtained by profiling with BCOZ.
+Figure 12a shows the profiling results for BCOZ. It can be reproduced with the following script.
 
 ```bash
 $ sudo ./rocksdb_2_bcoz.sh
 ```
 
-Load the generated profile.coz into [plot](https://plasma-umass.org/coz/).
+Load the generated profile.coz file into [plot](https://plasma-umass.org/coz/).
 
-**Note**: Although the reported results and the Figure 12a may differ in details, you should be able to figure out the predicted performance gain through optimizing blocking I/O events (I/O subclass in the figure) is high. Furthermore, predicted performance gain through optimizing filter block read (*GetFilterPartitionBlock*) is highest among the index and data block reads (*IndexBlockIter* and *DataBlockIter*, respectively).
+**Note**: While there may be differences in detail between the reported results and Figure 12a, you should still be able to discern that the predicted performance gain through optimizing blocking I/O events (*I/O subclass* in the figure) is significant. Furthermore, the predicted performance gain through optimizing filter block reads (*GetFilterPartitionBlock*) is the highest among the index and data block reads (*IndexBlockIter* and *DataBlockIter*, respectively).
 
-Figure 12b is obtained by comparing the result of baseline and optimized execution. We opened our asynchronous I/O-enabled RocksDB code as an optimization, in rocksdb\_aio directory.
+Figure 12b shows the performance change after utilizing the asynchronous I/O interface (i.e., io\_uring). We have made our asynchronous I/O-enabled RocksDB code available as an optimization in the rocksdb\_aio directory. You can reproduce this by running the following instructions.
 
 ```bash
 $ cd ~
@@ -290,7 +290,6 @@ $ sudo ./rocksdb_2_performance.sh
 
 [Print performance of each execution]
 $ cat rocksdb_2.txt
-
 ```
 
 The command for the both execution is as follows.
@@ -304,31 +303,30 @@ $ ./db_bench_perf --threads=8 --cache_index_and_filter_blocks=true --bloom_bits=
 --sine_mix_rate_interval_milliseconds=5000 --sine_a=1000 --sine_b=0.000073 --sine_d=4500 --ttl_seconds=$((3600*24*365))
 ```
 
-**Note**: We used fast SSD in this experiment.
+**Note**: We used fast SSD in both (baseline and asynchronous I/O) experiment.
 
 #### 5-3-5. RocksDB-*fillrandom*
 
-In this experiment, BCOZ identifies and address the bottleneck of write-only workload. We profiled *fillrandom* in db\_bench. The size of the key-value pair is 1KB and the number of worker thread is 16.
+In this experiment, BCOZ identifies and addresses the bottleneck of write-only workload. We profiled *fillrandom* in db\_bench. The size of the key-value pair is 1KB and the number of worker thread is 16.
 
 
-Figure 13b, 13c are obtained by profiling with BCOZ
+Figure 13b and 13c show the profiling results for BCOZ. It can be reproduced with the following script.
 
 ```bash
 $ sudo ./rocksdb_3_bcoz.sh
 ```
 
-Load the generated profile.coz into [plot](https://plasma-umass.org/coz/).
+Load the generated profile.coz into file [plot](https://plasma-umass.org/coz/).
 
-**Note**: Although the reported results and the Figure 13b, 13c may differ in details, you should be able to figure out the predicted performance gain through optimizing compression events is higher than optimizing I/O events. Furthermore, optimizing synchronization between worker threads and write stall of worker threads are more important than optimizing WAL (write-ahead-log) events.
+**Note**: While there may be differences in detail between the reported results and Figure 13b and 13c, you should still be able to discern that the predicted performance gain from optimizing compression events is higher than from optimizing I/O events. Furthermore, optimizing the synchronization between worker threads (*JoinBatchGroup*) and write stall of worker threads (*DelayWrite*) are more important than optimizing WAL (write-ahead-log) events.
 
-Figure 14 is obtained by running `db_bench_perf` while adjusting options.
+Figure 14 shows the performance change after optimization. This can be reproduced with the following script.
 
 ```bash
 $ sudo ./rocksdb_3_performance.sh
 
 [Print performance of each execution]
 $ cat rocksdb_3.txt
-
 ```
 
 The command for the baseline execution is as follows.
@@ -337,21 +335,26 @@ The command for the baseline execution is as follows.
 ./db_bench_perf --threads=16 --bloom_bits=10 --num=$((10*1024*1024)) --key_size=48 --value_size=43 \
 --cache_size=$((10*1024*1024*1024)) --use_direct_reads=true --use_direct_io_for_flush_and_compaction=true \
 --ttl_seconds=$((60*60*24*30*12)) --partition_index=true --partition_index_and_filters=true --db=/media/nvme_fast/rocksdb_temp \
---use_existing_db=false --max_write_buffer_number=2 --max_background_compactions=1 --benchmarks=fillrandom
+--use_existing_db=false --benchmarks=fillrandom
 ```
 
-* `RamDisk`: change *db* to the ramdisk.
-* `no-WAL`: add --disable\_wal=true to the command.
-* `Compress+`: add --compress\_type=none to the command.
-* `Comp+`: increase the number of *max_background_compactions* to 2
-* `Stall`: increase the number of *max_write_buffer_number* to 16
+* `RamDisk`: *db* is changed to the directory that residing on the ramdisk.
+* `no-WAL`: --disable\_wal=true is added to the command.
+* `Compress+`: --compress\_type=none is added to the command.
+* `Comp+`: the number of *max_background_compactions* is increased to 4
+* `Stall`: the number of *max_write_buffer_number* is increased to 16
+
+(**RamDisk**) 
 
 ### 5-4. NPB
+
+In this experiment, BCOZ identifies and addresses the bottleneck of compute-intensive (*integer sort*) workload. The number of OpenMp thread is 32 and the number of cores allocated to NPB is adjusted to mimic the actual optimization of the CPU scheduling off-CPU subclass. The baseline execution allocates a single core to NPB.
 
 #### 5-4-1. Build
 
 ```
 $ cd benchmarks/NPB
+$ cp /usr/lib/x86_64-linux-gnu/libgomp.so.1 /usr/local/lib/glibc-testing/lib
 
 [Binary for measuring performance without BCOZ]
 $ cp IS/is_bak.c IS/is.c
@@ -366,34 +369,21 @@ $ cd bin; mv is.C.x is.C.x_bcoz; cd ..
 
 #### 5-4-2. BCOZ
 
-```
-[Run IS with 32 openmp threads]
-$ export OMP_NUM_THREADS=32
+Figure 15a and 15b show the profiling results for BCOZ. It can be reproduced with the following script.
 
-[Run IS with BCOZ (default run) -> Figure 15a]
-$ for((i=0;i<5;i++)); do sleep 2; taskset -c 0 bcoz run --- ./bin/is.C.x_bcoz; done
-$ mv profile.coz profile_line-level.coz
-
-[Run IS with BCOZ (specifying offcpu subclass) -> Figure 15b]
-[# cores=1]
-$ for((i=0;i<5;i++)); do sleep 2; taskset -c 0 bcoz run --blocked-scope s --- ./bin/is.C.x_bcoz; done
-[# cores=2]
-$ for((i=0;i<5;i++)); do sleep 2; taskset -c 0-1 bcoz run --blocked-scope s --- ./bin/is.C.x_bcoz; done
-[# cores=4]
-$ for((i=0;i<5;i++)); do sleep 2; taskset -c 0-3 bcoz run --blocked-scope s --- ./bin/is.C.x_bcoz; done
-[# cores=8]
-$ for((i=0;i<5;i++)); do sleep 2; taskset -c 0-7 bcoz run --blocked-scope s --- ./bin/is.C.x_bcoz; done
-[# cores=16]
-$ for((i=0;i<5;i++)); do sleep 2; taskset -c 0-15 bcoz run --blocked-scope s --- ./bin/is.C.x_bcoz; done
-[# cores=32]
-$ for((i=0;i<5;i++)); do sleep 2; taskset -c 0-31 bcoz run --blocked-scope s --- ./bin/is.C.x_bcoz; done
-
-$ mv profile.coz profile_subclass-level.coz
+```bash
+$ ./npb_bcoz.sh
 ```
 
-Load the generated '.coz' file into [plot](https://plasma-umass.org/coz/). Figure 15a and 15b are obtained from `profile_line-level.coz` and `profile_subclass-level.coz`, respectively.
+Load the generated '.coz' files into [plot](https://plasma-umass.org/coz/). Figure 15a and 15b are obtained from `profile_line-level.coz` and `profile_subclass-level-X.coz` (X=1,2,4,8,16,32), respectively.
 
-To compare the virtual speedup results with actual speedup (Figure 15c), try to run `is.C.x_perf` without BCOZ.
+Figure 15c shows the program speedup (relative in throughput) after allocating more cores. This can be calculated with the following script.
+
+```bash
+$ ./npb_perf.sh
+```
+
+**Note**: Figure 15c shows the actual performance improvement and virtual speedup results when the number of allocated cores is increased. The actual program speedup can be calculated from the throughput obtained by running `./npb_perf.sh`. If the throughput increased by a factor of X, the program speedup is (1-1/X) * 100 (%) (e.g., if X=4, the program speedup is 75%). The virtual speedup values in Figure 15c represent the program speedups for each plot in Figure 15b when the line speedup is 100%.
 
 ### 5-5. Overhead
-
+ 
