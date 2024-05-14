@@ -1,5 +1,7 @@
 #!/bin/bash
 
+ulimit -n 1048576
+
 ### Compaction thread
 
 # ProcessKeyValueCompaction

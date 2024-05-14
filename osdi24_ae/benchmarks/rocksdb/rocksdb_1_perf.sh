@@ -1,5 +1,7 @@
 #!/bin/bash
 
+ulimit -n 1048576
+
 # Baseline
 sync
 echo 3 > /proc/sys/vm/drop_caches

@@ -171,6 +171,8 @@ $ cp /lib/x86_64-linux-gnu/libgflags.so.2.2 /usr/local/lib/glibc-testing/lib
 In experiments RocksDB-*prefix\_dist* and RocksDB-*allrandom*, we execute a read-only workload using the same dataset. We load 100GB of data onto each SSD (high-end and low-end). Loading the data takes around 2~3 hours with our SSDs.
 
 ```bash
+$ ulimit -n 1048576
+
 [Load data on high-end ssd]
 $ ./db_bench_perf --threads=1 --bloom_bits=10 --num=$((1024*1024*1024)) --key_size=48 --value_size=43 \
 --cache_size=$((10*1024*1024*1024)) --use_direct_reads=true --use_direct_io_for_flush_and_compaction=true \
@@ -189,6 +191,8 @@ $ ./db_bench_perf --threads=1 --bloom_bits=10 --num=$((1024*1024*1024)) --key_si
 **Note**: Because of the data retained in the memtable, compaction will occur initially when you start the workload. To prevent compaction from affecting subsequent read-only workloads, perform a dummy run (not intended for performance measurement) once for each dataset as follows.
 
 ```bash
+$ ulimit -n 1048576
+
 [Dummy run on dataset in fast ssd]
 $ ./db_bench_perf --threads=1 --cache_index_and_filter_blocks=true --bloom_bits=10 --partition_index=true \
 --partition_index_and_filters=true --num=$((1024*1024*1024)) --reads=1024 --use_direct_reads=true --key_size=48 \
