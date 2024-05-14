@@ -138,7 +138,7 @@ Load the generated `.coz` files (profile\_case1.coz and profile\_case2.coz) into
 Many libraries are dynamically loaded when running db\_bench. As explained in [glibc build](https://github.com/s3yonsei/blocked_samples/tree/main?tab=readme-ov-file#getting-started-with-blocked-samples), to obtain correct profiling results, the libraries should be rebuilt to do not omit frame pointers. In our experiments, instead of rebuilding them all, we statically link some libraries with the execution binary.
 
 ```bash
-$ cd benchmarks/RocksDB
+$ cd benchmarks/rocksdb
 $ make clean
 
 [Required libraries]
