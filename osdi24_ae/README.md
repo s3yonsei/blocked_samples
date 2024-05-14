@@ -162,6 +162,7 @@ $ mv db_bench db_bench_bcoz
 $ sudo cp /lib/x86_64-linux-gnu/libtbb.so.2 /usr/local/lib/glibc-testing/lib
 $ sudo cp /lib/x86_64-linux-gnu/libnuma.so.1 /usr/local/lib/glibc-testing/lib
 $ sudo cp /lib/x86_64-linux-gnu/libgflags.so.2.2 /usr/local/lib/glibc-testing/lib
+$ sudo cp /lib/x86_64-linux-gnu/libz.so.1 /usr/local/lib/glibc-testing/lib
 ```
 
 **Note**: Built static libraries are removed with `$ make clean`. Please backup these libraries and copy at making db\_bench. We modified Makefile to add compile flags needed for generating debug information and preserving frame pointers, as well as linking static libraries.
