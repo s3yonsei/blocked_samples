@@ -230,7 +230,7 @@ Load the generated profile\_rocksdb\_1.coz file into [plot](https://plasma-umass
 Figure 10b shows the performance change after optimization. It can be reproduced with the following script.
 
 ```bash
-$ sudo ./rocksdb_1_performance.sh
+$ sudo ./rocksdb_1_perf.sh
 
 [Print performance of each execution]
 $ cat rocksdb_1.txt
@@ -285,7 +285,7 @@ $ cd ../rocksdb
 ```
 
 ```bash
-$ sudo ./rocksdb_2_performance.sh
+$ sudo ./rocksdb_2_perf.sh
 
 [Print performance of each execution]
 $ cat rocksdb_2.txt
@@ -322,7 +322,7 @@ Load the generated profile\_rocksdb\_3.coz into file [plot](https://plasma-umass
 Figure 14 shows the performance change after optimization. This can be reproduced with the following script.
 
 ```bash
-$ sudo ./rocksdb_3_performance.sh
+$ sudo ./rocksdb_3_perf.sh
 
 [Print performance of each execution]
 $ cat rocksdb_3.txt
