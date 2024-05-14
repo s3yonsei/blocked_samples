@@ -130,6 +130,7 @@ $ sudo make clean && sudo make
 $ sudo mv perf bperf
 $ sudo cp bperf /usr/bin
 $ sudo sh -c 'echo 0 > /proc/sys/kernel/kptr_restrict'
+$ sudo sh -c 'echo 1 > /proc/sys/kernel/perf_event_paranoid'
 ```
 
 #### 3-3. Simple test for bperf
