@@ -63,4 +63,4 @@ bcoz run --fixed-line block_based_table_reader.cc:2460 --- ./db_bench_bcoz --thr
 --sine_mix_rate_interval_milliseconds=5000 --sine_a=1000 --sine_b=0.000073 --sine_d=4500 --ttl_seconds=$((3600*24*365))
 
 
-cp profile.coz profile_rocksdb_2.coz
+mv profile.coz profile_rocksdb_2.coz

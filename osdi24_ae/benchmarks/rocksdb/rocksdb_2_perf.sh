@@ -17,7 +17,7 @@ sleep 2
 --iter_k=2.517 --iter_sigma=14.236 --mix_get_ratio=1 --mix_put_ratio=0 --mix_seek_ratio=0 \
 --sine_mix_rate_interval_milliseconds=5000 --sine_a=1000 --sine_b=0.000073 --sine_d=4500 --ttl_seconds=$((3600*24*365)) > temp.txt
 
-echo "Baseline" > rocksdb_2.txt
+echo "[Baseline]" > rocksdb_2.txt
 cat temp.txt | grep "mixgraph" >> rocksdb_2.txt
 
 #aio
@@ -37,7 +37,7 @@ sleep 2
 --iter_k=2.517 --iter_sigma=14.236 --mix_get_ratio=1 --mix_put_ratio=0 --mix_seek_ratio=0 \
 --sine_mix_rate_interval_milliseconds=5000 --sine_a=1000 --sine_b=0.000073 --sine_d=4500 --ttl_seconds=$((3600*24*365)) > temp.txt
 
-echo "RocksDB-aio" >> ../rocksdb/rocksdb_2.txt
+echo "[RocksDB-aio]" >> ../rocksdb/rocksdb_2.txt
 cat temp.txt | grep "mixgraph" >> ../rocksdb/rocksdb_2.txt
 
 cd ../rocksdb

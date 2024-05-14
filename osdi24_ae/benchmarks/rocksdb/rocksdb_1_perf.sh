@@ -6,7 +6,7 @@ ulimit -n 1048576
 sync
 echo 3 > /proc/sys/vm/drop_caches
 
-echo "Baseline"
+echo "[Baseline]"
 
 sleep 2
 
@@ -18,14 +18,14 @@ sleep 2
 --keyrange_num=30 --mix_get_ratio=1 --mix_put_ratio=0 --mix_seek_ratio=0 --value_k=0.2615 --value_sigma=25.45 \
 --iter_k=2.517 --iter_sigma=14.236  --sine_mix_rate_interval_milliseconds=5000 --sine_a=1000 --sine_b=0.000073 --sine_d=4500 --ttl_seconds=$((3600*24*365)) > temp.txt
 
-echo "Baseline" > rocksdb_1.txt
+echo "[Baseline]" > rocksdb_1.txt
 cat temp.txt | grep "mixgraph" >> rocksdb_1.txt
 
 # SSD+
 sync
 echo 3 > /proc/sys/vm/drop_caches
 
-echo "SSD+"
+echo "[SSD+]"
 
 sleep 2
 
@@ -37,14 +37,14 @@ sleep 2
 --keyrange_num=30 --mix_get_ratio=1 --mix_put_ratio=0 --mix_seek_ratio=0 --value_k=0.2615 --value_sigma=25.45 \
 --iter_k=2.517 --iter_sigma=14.236  --sine_mix_rate_interval_milliseconds=5000 --sine_a=1000 --sine_b=0.000073 --sine_d=4500 --ttl_seconds=$((3600*24*365)) > temp.txt
 
-echo "SSD+" >> rocksdb_1.txt
+echo "[SSD+]" >> rocksdb_1.txt
 cat temp.txt | grep "mixgraph" >> rocksdb_1.txt
 
 # Shard-2
 sync
 echo 3 > /proc/sys/vm/drop_caches
 
-echo "Shard-2"
+echo "[Shard-2]"
 
 sleep 2
 
@@ -56,14 +56,14 @@ sleep 2
 --keyrange_num=30 --mix_get_ratio=1 --mix_put_ratio=0 --mix_seek_ratio=0 --value_k=0.2615 --value_sigma=25.45 \
 --iter_k=2.517 --iter_sigma=14.236  --sine_mix_rate_interval_milliseconds=5000 --sine_a=1000 --sine_b=0.000073 --sine_d=4500 --ttl_seconds=$((3600*24*365)) > temp.txt
 
-echo "Shard-2" >> rocksdb_1.txt
+echo "[Shard-2]" >> rocksdb_1.txt
 cat temp.txt | grep "mixgraph" >> rocksdb_1.txt
 
 # Shard-4
 sync
 echo 3 > /proc/sys/vm/drop_caches
 
-echo "Shard-4"
+echo "[Shard-4]"
 
 sleep 2
 
@@ -75,14 +75,14 @@ sleep 2
 --keyrange_num=30 --mix_get_ratio=1 --mix_put_ratio=0 --mix_seek_ratio=0 --value_k=0.2615 --value_sigma=25.45 \
 --iter_k=2.517 --iter_sigma=14.236  --sine_mix_rate_interval_milliseconds=5000 --sine_a=1000 --sine_b=0.000073 --sine_d=4500 --ttl_seconds=$((3600*24*365)) > temp.txt
 
-echo "Shard-4" >> rocksdb_1.txt
+echo "[Shard-4]" >> rocksdb_1.txt
 cat temp.txt | grep "mixgraph" >> rocksdb_1.txt
 
 # Shard-8
 sync
 echo 3 > /proc/sys/vm/drop_caches
 
-echo "Shard-8"
+echo "[Shard-8]"
 
 sleep 2
 
@@ -94,14 +94,14 @@ sleep 2
 --keyrange_num=30 --mix_get_ratio=1 --mix_put_ratio=0 --mix_seek_ratio=0 --value_k=0.2615 --value_sigma=25.45 \
 --iter_k=2.517 --iter_sigma=14.236  --sine_mix_rate_interval_milliseconds=5000 --sine_a=1000 --sine_b=0.000073 --sine_d=4500 --ttl_seconds=$((3600*24*365)) > temp.txt
 
-echo "Shard-8" >> rocksdb_1.txt
+echo "[Shard-8]" >> rocksdb_1.txt
 cat temp.txt | grep "mixgraph" >> rocksdb_1.txt
 
 # Shard-16
 sync
 echo 3 > /proc/sys/vm/drop_caches
 
-echo "Shard-16"
+echo "[Shard-16]"
 
 sleep 2
 
@@ -113,14 +113,14 @@ sleep 2
 --keyrange_num=30 --mix_get_ratio=1 --mix_put_ratio=0 --mix_seek_ratio=0 --value_k=0.2615 --value_sigma=25.45 \
 --iter_k=2.517 --iter_sigma=14.236  --sine_mix_rate_interval_milliseconds=5000 --sine_a=1000 --sine_b=0.000073 --sine_d=4500 --ttl_seconds=$((3600*24*365)) > temp.txt
 
-echo "Shard-16" >> rocksdb_1.txt
+echo "[Shard-16]" >> rocksdb_1.txt
 cat temp.txt | grep "mixgraph" >> rocksdb_1.txt
 
 # Shard-32
 sync
 echo 3 > /proc/sys/vm/drop_caches
 
-echo "Shard-32"
+echo "[Shard-32]"
 
 sleep 2
 
@@ -132,14 +132,14 @@ sleep 2
 --keyrange_num=30 --mix_get_ratio=1 --mix_put_ratio=0 --mix_seek_ratio=0 --value_k=0.2615 --value_sigma=25.45 \
 --iter_k=2.517 --iter_sigma=14.236  --sine_mix_rate_interval_milliseconds=5000 --sine_a=1000 --sine_b=0.000073 --sine_d=4500 --ttl_seconds=$((3600*24*365)) > temp.txt
 
-echo "Shard-32" >> rocksdb_1.txt
+echo "[Shard-32]" >> rocksdb_1.txt
 cat temp.txt | grep "mixgraph" >> rocksdb_1.txt
 
 # Shard-64
 sync
 echo 3 > /proc/sys/vm/drop_caches
 
-echo "Shard-64"
+echo "[Shard-64]"
 
 sleep 2
 
@@ -151,7 +151,7 @@ sleep 2
 --keyrange_num=30 --mix_get_ratio=1 --mix_put_ratio=0 --mix_seek_ratio=0 --value_k=0.2615 --value_sigma=25.45 \
 --iter_k=2.517 --iter_sigma=14.236  --sine_mix_rate_interval_milliseconds=5000 --sine_a=1000 --sine_b=0.000073 --sine_d=4500 --ttl_seconds=$((3600*24*365)) > temp.txt
 
-echo "Shard-64" >> rocksdb_1.txt
+echo "[Shard-64]" >> rocksdb_1.txt
 cat temp.txt | grep "mixgraph" >> rocksdb_1.txt
 
 
