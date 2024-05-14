@@ -274,7 +274,7 @@ $ apt-get install libudev-dev libaio-dev
 $ git clone https://github.com/axboe/liburing.git
 $ cd liburing
 $ make && sudo make install
-$ cp liburing.h ~/blocked_samples/osdi24_ae/benchmarks/rocksdb_aio/aio/
+$ cp src/include/liburing.h ~/blocked_samples/osdi24_ae/benchmarks/rocksdb_aio/aio/
 $ cd ~/blocked_samples/osdi24_ae/benchmarks/rocksdb_aio
 
 $ make libsnappy.a DEBUG_LEVEL=2 -j $(nproc)
