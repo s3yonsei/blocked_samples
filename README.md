@@ -72,6 +72,7 @@ $ sudo scripts/config --disable SYSTEM_REVOCATION_KEYS
 #### 1-4. Build the kernel
 
 ```bash
+$ sudo make menuconfig
 $ sudo make -j$(nproc) && sudo make modules -j$(nproc) && sudo make INSTALL_MOD_STRIP=1 modules_install -j$(nproc) && sudo make install -j$(nproc)
 ```
 
