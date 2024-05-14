@@ -157,3 +157,4 @@ cat temp.txt | grep "mixgraph" >> rocksdb_1.txt
 
 rm temp.txt
 
+cat rocksdb_1.txt

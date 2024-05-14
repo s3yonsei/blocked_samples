@@ -40,5 +40,10 @@ sleep 2
 echo "[RocksDB-aio]" >> ../rocksdb/rocksdb_2.txt
 cat temp.txt | grep "mixgraph" >> ../rocksdb/rocksdb_2.txt
 
+rm temp.txt
+
 cd ../rocksdb
 
+rm temp.txt
+
+cat rocksdb_2.txt

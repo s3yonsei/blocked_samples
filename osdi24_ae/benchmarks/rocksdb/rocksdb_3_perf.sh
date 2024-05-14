@@ -15,8 +15,8 @@ sleep 2
 --ttl_seconds=$((60*60*24*30*12)) --partition_index=true --partition_index_and_filters=true --db=/media/nvme_fast/rocksdb_temp \
 --use_existing_db=false --benchmarks=fillrandom > temp.txt
 
-echo "Baseline" > rocksdb_1.txt
-cat temp.txt | grep fillrandom >> rocksdb_1.txt
+echo "Baseline" > rocksdb_3.txt
+cat temp.txt | grep fillrandom >> rocksdb_3.txt
 
 rm /media/nvme_fast/rocksdb_temp/*
 
@@ -33,8 +33,8 @@ sleep 2
 --ttl_seconds=$((60*60*24*30*12)) --partition_index=true --partition_index_and_filters=true --db=/media/nvme_fast/rocksdb_temp \
 --use_existing_db=false --benchmarks=fillrandom > temp.txt
 
-echo "Ramdisk" >> rocksdb_1.txt
-cat temp.txt | grep fillrandom >> rocksdb_1.txt
+echo "Ramdisk" >> rocksdb_3.txt
+cat temp.txt | grep fillrandom >> rocksdb_3.txt
 
 rm /media/nvme_fast/rocksdb_temp/*
 rm /media/ramdisk/*
@@ -52,8 +52,8 @@ sleep 2
 --ttl_seconds=$((60*60*24*30*12)) --partition_index=true --partition_index_and_filters=true --db=/media/nvme_fast/rocksdb_temp \
 --use_existing_db=false --benchmarks=fillrandom > temp.txt
 
-echo "no-WAL" >> rocksdb_1.txt
-cat temp.txt | grep fillrandom >> rocksdb_1.txt
+echo "no-WAL" >> rocksdb_3.txt
+cat temp.txt | grep fillrandom >> rocksdb_3.txt
 
 rm /media/nvme_fast/rocksdb_temp/*
 
@@ -70,8 +70,8 @@ sleep 2
 --ttl_seconds=$((60*60*24*30*12)) --partition_index=true --partition_index_and_filters=true --db=/media/nvme_fast/rocksdb_temp \
 --use_existing_db=false --benchmarks=fillrandom > temp.txt
 
-echo "Compress+" >> rocksdb_1.txt
-cat temp.txt | grep fillrandom >> rocksdb_1.txt
+echo "Compress+" >> rocksdb_3.txt
+cat temp.txt | grep fillrandom >> rocksdb_3.txt
 
 rm /media/nvme_fast/rocksdb_temp/*
 
@@ -88,8 +88,8 @@ sleep 2
 --ttl_seconds=$((60*60*24*30*12)) --partition_index=true --partition_index_and_filters=true --db=/media/nvme_fast/rocksdb_temp \
 --use_existing_db=false --benchmarks=fillrandom > temp.txt
 
-echo "Comp+" >> rocksdb_1.txt
-cat temp.txt | grep fillrandom >> rocksdb_1.txt
+echo "Comp+" >> rocksdb_3.txt
+cat temp.txt | grep fillrandom >> rocksdb_3.txt
 
 rm /media/nvme_fast/rocksdb_temp/*
 
@@ -106,10 +106,12 @@ sleep 2
 --ttl_seconds=$((60*60*24*30*12)) --partition_index=true --partition_index_and_filters=true --db=/media/nvme_fast/rocksdb_temp \
 --use_existing_db=false --benchmarks=fillrandom > temp.txt
 
-echo "Stall" >> rocksdb_1.txt
-cat temp.txt | grep fillrandom >> rocksdb_1.txt
+echo "Stall" >> rocksdb_3.txt
+cat temp.txt | grep fillrandom >> rocksdb_3.txt
 
 rm /media/nvme_fast/rocksdb_temp/*
 
 
 rm temp.txt
+
+cat rocksdb_3.txt
