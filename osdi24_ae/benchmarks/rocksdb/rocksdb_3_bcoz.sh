@@ -98,3 +98,5 @@ bcoz run --fixed-line db_impl_write.cc:1241 ./db_bench_bcoz --threads=16 --bloom
 --ttl_seconds=$((60*60*24*30*12)) --partition_index=true --partition_index_and_filters=true --db=/media/nvme_fast/rocksdb_temp \
 --use_existing_db=false --benchmarks=fillrandom > temp.txt
 
+
+mv profile.coz profile_rocksdb_3.coz

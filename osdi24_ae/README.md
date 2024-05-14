@@ -223,7 +223,7 @@ Figure 10a shows the profiling results for BCOZ. It can be reproduced with the f
 $ sudo ./rocksdb_1_bcoz.sh
 ```
 
-Load the generated profile.coz file into [plot](https://plasma-umass.org/coz/).
+Load the generated profile\_rocksdb\_1.coz file into [plot](https://plasma-umass.org/coz/).
 
 **Note**: While there may be differences in detail between the reported results and Figure 10a, you should still be able to discern that the predicted performance gain from optimizing lock contention (*GetDataBlockFromCache*) is larger than that from optimizing I/O events (*ReadBlockContents*).
 
@@ -262,7 +262,7 @@ Figure 12a shows the profiling results for BCOZ. It can be reproduced with the f
 $ sudo ./rocksdb_2_bcoz.sh
 ```
 
-Load the generated profile.coz file into [plot](https://plasma-umass.org/coz/).
+Load the generated profile\_rocksdb\_2.coz file into [plot](https://plasma-umass.org/coz/).
 
 **Note**: While there may be differences in detail between the reported results and Figure 12a, you should still be able to discern that the predicted performance gain through optimizing blocking I/O events (*I/O subclass* in the figure) is significant. Furthermore, the predicted performance gain through optimizing filter block reads (*GetFilterPartitionBlock*) is the highest among the index and data block reads (*IndexBlockIter* and *DataBlockIter*, respectively).
 
@@ -315,7 +315,7 @@ Figure 13b and 13c show the profiling results for BCOZ. It can be reproduced wit
 $ sudo ./rocksdb_3_bcoz.sh
 ```
 
-Load the generated profile.coz into file [plot](https://plasma-umass.org/coz/).
+Load the generated profile\_rocksdb\_3.coz into file [plot](https://plasma-umass.org/coz/).
 
 **Note**: While there may be differences in detail between the reported results and Figure 13b and 13c, you should still be able to discern that the predicted performance gain from optimizing compression events is higher than from optimizing I/O events. Furthermore, optimizing the synchronization between worker threads (*JoinBatchGroup*) and write stall of worker threads (*DelayWrite*) are more important than optimizing WAL (write-ahead-log) events.
 

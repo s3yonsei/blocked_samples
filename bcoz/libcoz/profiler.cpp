@@ -361,11 +361,11 @@ void profiler::profiler_thread(spinlock& l) {
     }
 
     // Lengthen the experiment if the min_delta is too small
-    /*if(min_delta < ExperimentTargetDelta) {
+    if(min_delta < ExperimentTargetDelta) {
       experiment_length *= 2;
     } else if(min_delta > ExperimentTargetDelta*2 && experiment_length >= ExperimentMinTime*2) {
       experiment_length /= 2;
-    }*/
+    }
 
     output.flush();
 

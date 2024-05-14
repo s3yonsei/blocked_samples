@@ -61,3 +61,6 @@ bcoz run --fixed-line block_based_table_reader.cc:2460 --- ./db_bench_bcoz --thr
 --cache_size=$((128*1024*1024)) --benchmarks=mixgraph --keyrange_num=1 --value_k=0.2615 --value_sigma=25.45 \
 --iter_k=2.517 --iter_sigma=14.236 --mix_get_ratio=1 --mix_put_ratio=0 --mix_seek_ratio=0 \
 --sine_mix_rate_interval_milliseconds=5000 --sine_a=1000 --sine_b=0.000073 --sine_d=4500 --ttl_seconds=$((3600*24*365))
+
+
+cp profile.coz profile_rocksdb_2.coz

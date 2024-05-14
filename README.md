@@ -336,6 +336,8 @@ $ bcoz run --fixed-line test_io_coz.c:55 --- ./test_io_bcoz
 
 Load the generated profile.coz file into [COZ plotter](https://plasma-umass.org/coz/).
 
+**Note**: profile.coz file is where virtual speedup results are accumulated, so be careful with filename management to avoid unintentionally writing results to the same file.
+
 ##### 5-4-3. Results
 
 <img src="https://github.com/s3yonsei/blocked_samples/blob/main/osdi24_ae/benchmarks/simple_test/example_results/example-bperf.PNG " width="100%">
