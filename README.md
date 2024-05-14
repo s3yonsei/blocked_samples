@@ -284,7 +284,7 @@ test\_io\_coz.c is same with test\_io.c except for the progress point in line 87
 We provided Makefile inside of the simple\_test. Make sure that rpath and dynamic-linker are appropriate.
 
 ```bash
-$ cd ~/blocked_samples/benchmarks/simple_test
+$ cd ~/blocked_samples/osdi24_ae/benchmarks/simple_test
 $ make clean && make
 ```
 
