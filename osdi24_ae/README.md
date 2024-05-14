@@ -50,13 +50,13 @@ Make sure that your device files (e.g., /dev/nvme0n1p1) are formatted with the e
 
 ```bash
 [Assuming that the device file name for slower SSD is /dev/nvme0n1p1 and for the faster device is /dev/nvme1n1p1]
-$ mkfs -t ext4 /dev/nvme0n1p1
-$ mkfs -t ext4 /dev/nvme1n1p1
+$ sudo mkfs -t ext4 /dev/nvme0n1p1
+$ sudo mkfs -t ext4 /dev/nvme1n1p1
 
-$ mkdir -p /media/nvme_slow /media/nvme_fast
+$ sudo mkdir -p /media/nvme_slow /media/nvme_fast
 
-$ mount -t ext4 /dev/nvme0n1p1 /media/nvme_slow
-$ mount -t ext4 /dev/nvme1n1p1 /media/nvme_fast
+$ sudo mount -t ext4 /dev/nvme0n1p1 /media/nvme_slow
+$ sudo mount -t ext4 /dev/nvme1n1p1 /media/nvme_fast
 ```
 
 ### 5-2. Motivational
