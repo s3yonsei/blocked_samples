@@ -6,7 +6,7 @@ ulimit -n 1048576
 sync
 echo 3 > /proc/sys/vm/drop_caches
 
-echo "Baseline"
+echo "[Baseline]"
 
 sleep 2
 
@@ -26,7 +26,7 @@ cd ../rocksdb_aio
 sync
 echo 3 > /proc/sys/vm/drop_caches
 
-echo "RocksDB-aio"
+echo "[RocksDB-aio]"
 
 sleep 2
 
