@@ -2,8 +2,20 @@
 
 ulimit -n 1048576
 
-### Compaction thread
+# Without fixed-line
+sync
+echo 3 > /proc/sys/vm/drop_caches
 
+sleep 2
+
+bcoz run --- ./db_bench_bcoz --threads=16 --bloom_bits=10 --num=$((10*1024*1024)) --key_size=1000 --value_size=24 --writes=$((1*1024*1024)) \
+--cache_size=$((10*1024*1024*1024)) --use_direct_reads=true --use_direct_io_for_flush_and_compaction=true \
+--ttl_seconds=$((60*60*24*30*12)) --partition_index=true --partition_index_and_filters=true --db=/media/nvme_fast/rocksdb_temp \
+--use_existing_db=false --benchmarks=fillrandom > temp.txt
+
+mv profile.coz profile_rocksdb_3.coz
+
+### Compaction thread
 # ProcessKeyValueCompaction
 for((i=0;i<=100;i+=10))
 do
@@ -75,7 +87,7 @@ do
 
 	sleep 2
 
-	bcoz run --fixed-line write_thread.cc:408 --end-to-end --fixed-speedup ${i} --- ./db_bench_bcoz --threads=16 --bloom_bits=10 --num=$((10*1024*1024)) --key_size=1000 --value_size=24 --writes=$((1*1024*1024)) \
+	bcoz run --fixed-line write_thread.cc:187 --end-to-end --fixed-speedup ${i} --- ./db_bench_bcoz --threads=16 --bloom_bits=10 --num=$((10*1024*1024)) --key_size=1000 --value_size=24 --writes=$((1*1024*1024)) \
 --cache_size=$((10*1024*1024*1024)) --use_direct_reads=true --use_direct_io_for_flush_and_compaction=true \
 --ttl_seconds=$((60*60*24*30*12)) --partition_index=true --partition_index_and_filters=true --db=/media/nvme_fast/rocksdb_temp \
 --use_existing_db=false --benchmarks=fillrandom > temp.txt
@@ -91,7 +103,7 @@ do
 
 	sleep 2
 
-	bcoz run --fixed-line db_impl_write.cc:1082 --end-to-end --fixed-speedup ${i} --- ./db_bench_bcoz --threads=16 --bloom_bits=10 --num=$((10*1024*1024)) --key_size=1000 --value_size=24 --writes=$((1*1024*1024)) \
+	bcoz run --fixed-line db_impl_write.cc:1663 --end-to-end --fixed-speedup ${i} --- ./db_bench_bcoz --threads=16 --bloom_bits=10 --num=$((10*1024*1024)) --key_size=1000 --value_size=24 --writes=$((1*1024*1024)) \
 --cache_size=$((10*1024*1024*1024)) --use_direct_reads=true --use_direct_io_for_flush_and_compaction=true \
 --ttl_seconds=$((60*60*24*30*12)) --partition_index=true --partition_index_and_filters=true --db=/media/nvme_fast/rocksdb_temp \
 --use_existing_db=false --benchmarks=fillrandom > temp.txt
@@ -114,4 +126,4 @@ do
 done
 
 
-mv profile.coz profile_rocksdb_3.coz
+mv profile.coz profile_rocksdb_3_fixed.coz

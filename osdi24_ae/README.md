@@ -315,7 +315,7 @@ Figure 13b and 13c show the profiling results for BCOZ. It can be reproduced wit
 $ sudo ./rocksdb_3_bcoz.sh
 ```
 
-Load the generated profile\_rocksdb\_3.coz into file [plot](https://plasma-umass.org/coz/).
+Load the generated .coz files into [plot](https://plasma-umass.org/coz/).
 
 **Note**: While there may be differences in detail between the reported results and Figure 13b and 13c, you should still be able to discern that the predicted performance gain from optimizing compression events is higher than from optimizing I/O events. Furthermore, optimizing the synchronization between worker threads (*JoinBatchGroup*) and write stall of worker threads (*DelayWrite*) are more important than optimizing WAL (write-ahead-log) events.
 
