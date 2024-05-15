@@ -112,7 +112,7 @@ $ bperf report -i perf_t1.data --no-children
 $ bperf report -i perf_t2.data --no-children
 ```
 
-Although the reported results and Figure 7 may differ in details, the off-CPU events corresponding to blocking I/O (**I** in the square brackets) for `__libc_pread64', and `__libc_pwrite`, and lock-waiting (**L** in the square brackets) for `pthread_cond_wait` should be reported.
+Although the reported results and Figure 7 may differ in details, the off-CPU events corresponding to blocking I/O (**I** in the square brackets) for `__libc_pread64`, and `__libc_pwrite`, and lock-waiting (**L** in the square brackets) for `pthread_cond_wait` should be reported.
 
 
 **Note**: If you want to campare perf's sampling results with bperf's, recording should be done after booting into an original Linux kernel rather than the Linux kernel for blocked samples.
