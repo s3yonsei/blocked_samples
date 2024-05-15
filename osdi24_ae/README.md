@@ -395,7 +395,7 @@ $ ./npb_perf.sh
 
 In this experiment, we compared the overhead of bperf with existing profiling techniques: *tracing*, which profiles only off-CPU events (i.e., *sched_switch* and *sched_wakeup*) using Linux perf's tracing mode, and *sampling*, which samples only on-CPU events using Linux perf's sampling mode (i.e., *task-clock*). Furthermore, we measured the overhead of profiling application with BCOZ.
 
-### 5-5-1. Stablize CPU frequency
+### 5-5-1. Stabilize CPU frequency
 
 The instability of CPU frequency can affect application performance, making it difficult to measure pure profiling overhead. Therefore, when measuring overhead, you should adjust the CPU frequency governor and the Intel CPU's cstate and pstate features to fix the frequency.
 
