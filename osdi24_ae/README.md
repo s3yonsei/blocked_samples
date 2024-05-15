@@ -443,6 +443,7 @@ Please refer to printed.txt to calculate performance drop. To measure the additi
 Figure 17 shows the overhead of profiling applications with BCOZ. The BCOZ overhead is categorized into three parts: `startup`, `sampling`, and `delays`. We have already incorporated code to distinguish between the three types of delays at the end of execution. Upon completing the profiling with BCOZ, the following line is printed to the terminal.
 
 ```bash
+[Values are in nanoseconds.]
 Overhead breakdown. Startup: xxxxxx real_main_time: yyyyyy end-to-end: zzzzzz
 ```
 
