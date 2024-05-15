@@ -395,7 +395,20 @@ $ ./npb_perf.sh
 
 In this experiment, we compared the overhead of bperf with existing profiling techniques: *tracing*, which profiles only off-CPU events (i.e., *sched_switch* and *sched_wakeup*) using Linux perf's tracing mode, and *sampling*, which samples only on-CPU events using Linux perf's sampling mode (i.e., *task-clock*). Furthermore, we measured the overhead of profiling application with BCOZ.
 
-### 5-5-1. Overhead of bperf
+### 5-5-1. Stablize CPU frequency
+
+The instability of CPU frequency can affect application performance, making it difficult to measure pure profiling overhead. Therefore, when measuring overhead, you should adjust the CPU frequency governor and the Intel CPU's cstate and pstate features to fix the frequency.
+
+```bash
+[Set GRUB_CMDLINE_LINUX_DEFAULT in /etc/default/grub as follows.]
+GRUB_CMDLINE_LINUX_DEFAULT="intel_idel.max_cstate=0 intel_pstate=disable processor.max_cstate=1 cpufreq.default_governor=performance"
+```
+
+If you can access the system BIOS, please set the CPU Power Management as "Maximum Performance".
+
+**Note**: Make sure that the frequency of the CPU is stabilized by `$ cat /proc/cpuinfo | grep MHz`.
+
+### 5-5-2. Overhead of bperf
 
 Figure 16 shows the performance drop (percent reduction in throughput or latency) and CPU cycle increase compared to the baseline. The profiling overhead can be calculated using the following profiling commands. Assume that the profiling target is a.out. 
 
@@ -426,7 +439,7 @@ $ bperf record -g -e task-clock -c 1000000 --weight --pid=${app}
 
 Please refer to printed.txt to calculate performance drop. To measure the additional CPU cycles (i.e., system-jiffies), we captured `/proc/stats` file before and after the executing of the application. By calculating the difference between start\_stat.txt and end\_stat.txt, you can determine the additional CPU cycles consumption.
 
-### 5-5-2. Overhead of BCOZ
+### 5-5-3. Overhead of BCOZ
 Figure 17 shows the overhead of profiling applications with BCOZ. The BCOZ overhead is categorized into three parts: `startup`, `sampling`, and `delays`. We have already incorporated code to distinguish between the three types of delays at the end of execution. Upon completing the profiling with BCOZ, the following line is printed to the terminal.
 
 ```bash
@@ -435,6 +448,6 @@ Overhead breakdown. Startup: xxxxxx real_main_time: yyyyyy end-to-end: zzzzzz
 
 You can calculate the overhead of BCOZ using the printed information.
 
-### 5-5-3. Additional applications
+### 5-5-4. Additional applications
 We measured additional applications, *NPB-ep* and *hackbench*, to cover on-CPU-intensive and off-CPU-intensive cases, respectively. The profiled application code for NPB-ep is located in `benchmarks/NPB/` and *hackbench* is located in `benchmarks/hackbench`. We executed NPB-ep without CPU core restriction and hackbench with the command `./hackbench -s 512 -l 30000 -T`.
 
