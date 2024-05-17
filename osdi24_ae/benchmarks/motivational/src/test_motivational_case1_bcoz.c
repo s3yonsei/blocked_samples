@@ -120,7 +120,7 @@ void* t_function1(void* arg)
 
 	//barrier(&cond, &shared_mutex);
 
-	while(i < 500) {
+	while(i < 1000) {
 		//COZ_PROGRESS;	
 		funcA();
 		printf("thread 1 iteration %d\n", i);
@@ -151,7 +151,7 @@ void* t_function2(void* arg)
 
 	//barrier(&cond, &shared_mutex);
 	
-	while(i < 500) {	
+	while(i < 1000) {	
 		compute_heavy();
 
 		printf("thread 2 iteration %d\n", i);

@@ -82,7 +82,7 @@ void funcB() {
 	compute_heavy(); 
 }
 
-void barrier(pthread_cond_t *c, pthread_mutex_t *m) {
+void barrier(pthread_cond_t *c, pthread_mutex_t *m) {	COZ_PROGRESS;
 	pthread_mutex_lock(m);
 	barrier_thread_count++;
 
@@ -120,7 +120,7 @@ void* t_function1(void* arg)
 	//barrier(&cond, &shared_mutex);
 
 	while(i < 1000) {
-		COZ_PROGRESS;	
+		//COZ_PROGRESS;	
 		funcA();
 		printf("thread 1 iteration %d\n", i);
 
