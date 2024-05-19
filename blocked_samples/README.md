@@ -9,8 +9,5 @@ Please follow the instructions in [Getting Started with Blocked Samples](https:/
 
 For the detailed description, please refer to the paper:
 
-**Identifying On-/Off-CPU Bottlenecks Together with Blocked Samples**.
-
-Minwoo Ahn (Sungkyunkwan Univ.), Jeongmin Han (Sungkyunkwan Univ.), Youngjin Kwon (KAIST), Jinkyu Jeong (Yonsei Univ.).
-
-*18th USENIX Symposium on Operating SYstems Design and Implementation (OSDI'24)*.
+**Identifying On-/Off-CPU Bottlenecks Together with Blocked Samples**, Minwoo Ahn, Jeongmin Han, Youngjin Kwon, Jinkyu Jeong.
+*The 18th USENIX Symposium on Operating SYstems Design and Implementation (OSDI'24)*, Santa Clara, CA, US, July 10-12, 2024
