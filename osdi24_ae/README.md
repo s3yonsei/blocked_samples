@@ -34,7 +34,7 @@ Blocked samples consists of two main components: the Linux kernel for blocked sa
 | Memory        | DDR4 2933 MHz, 384 GB (32 GB x 12)  |
 | **OS**        | Ubuntu 20.04 Server |
 
-**Note**: It is not necessary to have the two specified NVMe SSDs. The RocksDB-*prefix\_dist* experiment requires NVMe SSDs with differing IOPS, while the rest of the experiments are sufficient with only one device.
+**Note**: It is not necessary to have the two specified NVMe SSDs. The "5.3.3. RocksDB-*prefix\_dist*" experiment requires NVMe SSDs with differing IOPS, while the rest of the experiments are sufficient with only one device.
 
 ## 4. Getting Started Instructions
 Please refer to the instructions in [Getting Started with Blocked Samples](https://github.com/s3yonsei/blocked_samples/tree/main?tab=readme-ov-file#getting-started-with-blocked-samples). This section will help you quickly verify whether blocked samples functions correctly. If you encounter any difficulties during this process, please contact us.
