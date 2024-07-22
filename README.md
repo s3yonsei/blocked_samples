@@ -8,6 +8,21 @@ For the detailed description, please refer to the paper:
 
 **Identifying On-/Off-CPU Bottlenecks Together with Blocked Samples**, Minwoo Ahn, Jeongmin Han, Youngjin Kwon, Jinkyu Jeong. *The 18th USENIX Symposium on Operating Systems Design and Implementation (OSDI'24)*, Santa Clara, CA, US, July 10-12, 2024
 
+~~~~
+@inproceedings {298760,
+author = {Minwoo Ahn and Jeongmin Han and Youngjin Kwon and Jinkyu Jeong},
+title = {Identifying {On-/Off-CPU} Bottlenecks Together with Blocked Samples},
+booktitle = {18th USENIX Symposium on Operating Systems Design and Implementation (OSDI 24)},
+year = {2024},
+isbn = {978-1-939133-40-3},
+address = {Santa Clara, CA},
+pages = {893--910},
+url = {https://www.usenix.org/conference/osdi24/presentation/ahn},
+publisher = {USENIX Association},
+month = jul
+}
+~~~~
+
 **Contacts**: Please contact us if you have any questions. [Minwoo Ahn](mailto:mwahn402@gmail.com), [Jinkyu Jeong](mailto:jinkyu@yonsei.ac.kr), [Scalable Systems Software Lab](https://cslab.yonsei.ac.kr), Yonsei University, South Korea
 
 
