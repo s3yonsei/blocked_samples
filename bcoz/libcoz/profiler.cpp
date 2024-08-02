@@ -621,7 +621,7 @@ void profiler::process_blocked_samples(thread_state* state) {
 	// Read recorded samples
 	for (perf_event::record r : state->sampler) {
 		if (r.is_sample()) {
-			REQUIRE(r.get_time() > state->last_sample_time) << "Already processed sample!";
+			REQUIRE(r.get_time() >= state->last_sample_time) << "Already processed sample!";
 			
 			state->last_sample_time = r.get_time();
 
@@ -702,7 +702,7 @@ void profiler::process_samples(thread_state* state) {
 
   for(perf_event::record r : state->sampler) {
     if(r.is_sample()) {
-      REQUIRE(r.get_time() > state->last_sample_time) << "Already processed sample!";
+      REQUIRE(r.get_time() >= state->last_sample_time) << "Already processed sample!";
       
 	  state->last_sample_time = r.get_time();
       
