@@ -6438,6 +6438,24 @@ static u64 perf_virt_to_phys(u64 virt)
 
 static struct perf_callchain_entry __empty_callchain = { .nr = 0, };
 
+/*
+ * Remove entries related to perf context.
+ */
+#define NR_REMOVE_IOWAIT	12
+#define NR_REMOVE_OFFCPU	11
+
+static void
+perf_callchain_remove(struct perf_callchain_entry *callchain, int nr_remove) {
+	int iter;
+
+	WARN_ON(nr_remove > callchain->nr);
+
+	for (iter = 1; iter < (callchain->nr - nr_remove); iter++)
+		callchain->ip[iter] = callchain->ip[iter + nr_remove];
+
+	callchain->nr -= nr_remove;
+}
+
 struct perf_callchain_entry *
 perf_callchain(struct perf_event *event, struct pt_regs *regs)
 {
@@ -6453,6 +6471,15 @@ perf_callchain(struct perf_event *event, struct pt_regs *regs)
 
 	callchain = get_perf_callchain(regs, 0, kernel, user,
 				       max_stack, crosstask, true);
+
+	/* Remove unnecessary (common) entries in callchain of the offcpu samples. */
+	if (is_sampling_event(event) && current->sched_out_timestamp && current->blocked_s && callchain) {
+		if (current->blocked_s == BLOCKED_IOWAIT)
+			perf_callchain_remove(callchain, NR_REMOVE_IOWAIT);
+		else
+			perf_callchain_remove(callchain, NR_REMOVE_OFFCPU);
+	}
+
 	return callchain ?: &__empty_callchain;
 }
 
@@ -6503,6 +6530,9 @@ void perf_prepare_sample(struct perf_event_header *header,
 		size += data->callchain->nr;
 
 		header->size += size * sizeof(u64);
+
+		if (is_sampling_event(event) && current->sched_out_timestamp && current->blocked_s)
+			data->ip = data->callchain->ip[1];
 	}
 
 	if (sample_type & PERF_SAMPLE_RAW) {
@@ -9681,7 +9711,8 @@ static int task_clock_event_add(struct perf_event *event, int flags)
 		}
 
 		perf_sample_data_init(&data, 0, period);
-		regs = task_pt_regs(current);
+		regs = this_cpu_ptr(&__perf_regs[0]);
+		perf_fetch_caller_regs(regs);
 		
 		/* optimization */
 		if (iteration > 0) {
