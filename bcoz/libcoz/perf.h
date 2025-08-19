@@ -145,11 +145,15 @@ public:
     friend class perf_event::iterator;
   public:
     record_type get_type() const { return static_cast<record_type>(_header->type); }
-	inline bool is_lock() const { return (_header->misc & PERF_RECORD_MISC_LOCKWAIT);}
-	inline bool is_sched() const { return (_header->misc & (PERF_RECORD_MISC_SCHED));}
-	inline bool is_io() const { return (_header->misc & (PERF_RECORD_MISC_IOWAIT));}
-	inline bool is_blocked() const { return (_header->misc & (PERF_RECORD_MISC_BLOCKED));}
-	inline bool is_blocked_any() const { return (_header->misc & (PERF_RECORD_MISC_BLOCKED | PERF_RECORD_MISC_IOWAIT | PERF_RECORD_MISC_SCHED | PERF_RECORD_MISC_LOCKWAIT));}
+    inline bool is_lock() const { return (_header->misc & PERF_RECORD_MISC_LOCKWAIT);}
+    inline bool is_sched() const { return (_header->misc & (PERF_RECORD_MISC_SCHED));}
+    inline bool is_io() const { return (_header->misc & (PERF_RECORD_MISC_IOWAIT));}
+    inline bool is_blocked() const { return (_header->misc & (PERF_RECORD_MISC_BLOCKED));}
+    inline bool is_blocked_any() const { return (_header->misc &
+                                                 (PERF_RECORD_MISC_BLOCKED |
+                                                 PERF_RECORD_MISC_IOWAIT |
+                                                 PERF_RECORD_MISC_SCHED |
+                                                 PERF_RECORD_MISC_LOCKWAIT));}
 
     inline bool is_mmap() const { return get_type() == record_type::mmap; }
     inline bool is_lost() const { return get_type() == record_type::lost; }

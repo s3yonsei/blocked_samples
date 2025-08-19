@@ -93,12 +93,6 @@ void profiler::startup(const string& outfile,
   sa.sa_flags = SA_SIGINFO;
   real::sigaction(SampleSignal, &sa, nullptr);
 
-  // Set up the blocked sampling signal handler
-  /*memset(&sa, 0, sizeof(sa));
-  sa.sa_sigaction = profiler::blocked_samples_ready;
-  sa.sa_flags = SA_SIGINFO;
-  real::sigaction(BlockedSignal, &sa, nullptr);*/
-
   // Begin sampling in the main thread
   thread_state* state = add_thread();
   REQUIRE(state) << "Failed to add thread state";
@@ -118,9 +112,9 @@ void profiler::profiler_thread(spinlock& l) {
   output.precision(2);
 
   if (_enable_print_log) {
-  	string filename("profiler");
-  	filename.append(to_string(gettid()) + ".txt");
-  	fout.open(filename);
+    string filename("profiler");
+    filename.append(to_string(gettid()) + ".txt");
+    fout.open(filename);
   }
 
   // Initialize the delay size RNG
@@ -192,20 +186,20 @@ void profiler::profiler_thread(spinlock& l) {
 
     _delay_size.store(delay_size);
 
-	size_t based_delay_size;
-	// Choose a based_delay size
-	if(_based_fixed_delay_size >= 0) {
-		based_delay_size = _based_fixed_delay_size;
-	} else {
-		size_t r = delay_dist(generator);
-		if(r <= ZeroSpeedupWeight) {
-			based_delay_size = 0;
-		} else {
-			based_delay_size = (r - ZeroSpeedupWeight) * SamplePeriod / SpeedupDivisions;
-		}
-	}
+    size_t based_delay_size;
+    // Choose a based_delay size
+    if(_based_fixed_delay_size >= 0) {
+        based_delay_size = _based_fixed_delay_size;
+    } else {
+      size_t r = delay_dist(generator);
+      if(r <= ZeroSpeedupWeight) {
+        based_delay_size = 0;
+      } else {
+        based_delay_size = (r - ZeroSpeedupWeight) * SamplePeriod / SpeedupDivisions;
+      }
+    }
 
-	_based_delay_size.store(based_delay_size);
+    _based_delay_size.store(based_delay_size);
 
     // Save the starting time and sample count
     size_t start_time = get_time();
@@ -214,30 +208,32 @@ void profiler::profiler_thread(spinlock& l) {
     size_t starting_blocked_scope = 0;
 
     if (_blocked_scope != 0) {
-		REQUIRE(_blocked_scope == 'a' || _blocked_scope == 'b' || _blocked_scope == 's' || _blocked_scope == 'l' || _blocked_scope == 'i' || _blocked_scope == 'o') << "No such blocked_scope!";
+      REQUIRE(_blocked_scope == 'a' || _blocked_scope == 'b' ||
+              _blocked_scope == 's' || _blocked_scope == 'l' ||
+              _blocked_scope == 'i' || _blocked_scope == 'o') << "No such blocked_scope!";
 
-    	switch (_blocked_scope) {
-    		case 'a':
-				starting_blocked_scope = _blocked_all.load();
-				break;
-			case 'i':
-				starting_blocked_scope = _blocked_io.load();
-				break;
-			case 's':
-				starting_blocked_scope = _blocked_sched.load();
-				break;
-			case 'l':
-				starting_blocked_scope = _blocked_lock.load();
-				break;
-			case 'b':
-				starting_blocked_scope = _blocked_blocked.load();
-				break;
-			case 'o':
-				starting_blocked_scope = _blocked_oncpu.load();
-				break;
-			default:
-				break;
-    	};
+      switch (_blocked_scope) {
+        case 'a':
+          starting_blocked_scope = _blocked_all.load();
+          break;
+        case 'i':
+          starting_blocked_scope = _blocked_io.load();
+          break;
+        case 's':
+          starting_blocked_scope = _blocked_sched.load();
+          break;
+        case 'l':
+          starting_blocked_scope = _blocked_lock.load();
+          break;
+        case 'b':
+          starting_blocked_scope = _blocked_blocked.load();
+          break;
+        case 'o':
+          starting_blocked_scope = _blocked_oncpu.load();
+          break;
+        default:
+          break;
+      };
     }
 
     // Save throughput point values at the start of the experiment
@@ -266,24 +262,25 @@ void profiler::profiler_thread(spinlock& l) {
         wait(SamplePeriod * SampleBatchSize);
       }
     } else {	  
-		  omit_experiment = false;
+      omit_experiment = false;
+
+      wait(experiment_length);
 	
-		  wait(experiment_length);
+      if (omit_experiment) {
+        omit_experiment = false;
+        _next_line.store(nullptr);
+        _experiment_active.store(false);
 	
-		  if (omit_experiment) {
-				omit_experiment = false;
-		    	_next_line.store(nullptr);
-				_experiment_active.store(false);
+        if (_running)
+          wait(ExperimentCoolOffTime);
 	
-				if (_running)	wait(ExperimentCoolOffTime);
-	
-				continue;
-	  	}
+        continue;
+      }
     }
 
     // Compute experiment parameters
     float speedup = (float)delay_size / (float)SamplePeriod;
-	float based_speedup = (float)based_delay_size / (float)SamplePeriod;
+    float based_speedup = (float)based_delay_size / (float)SamplePeriod;
     long experiment_delay = _global_delay.load() - starting_delay_time;
     long duration = get_time() - start_time - experiment_delay;
     long selected_samples = selected->get_samples() - starting_samples;
@@ -292,49 +289,59 @@ void profiler::profiler_thread(spinlock& l) {
 
     output << "experiment\tselected=";
 
-	if (_blocked_scope != 0) {
-		REQUIRE(_blocked_scope == 'a' || _blocked_scope == 'b' || _blocked_scope == 's' || _blocked_scope == 'l' || _blocked_scope == 'i' || _blocked_scope == 'o') << "No such blocked_scope!";
-    	switch (_blocked_scope) {
-			case 'o':
-				output << "ON_CPU";
-				selected_samples = _blocked_oncpu.load() - starting_blocked_scope;
-				break;
-    		case 'i':
-				output << "IO";
-				selected_samples = _blocked_io.load() - starting_blocked_scope;
-				break;
-			case 'l':
-				output << "LOCK";
-				selected_samples = _blocked_lock.load() - starting_blocked_scope;
-				break;
-			case 's':
-				output << "SCHEDULING";
-				selected_samples = _blocked_sched.load() - starting_blocked_scope;
-				break;
-			case 'b':
-				output << "BLOCKED";
-				selected_samples = _blocked_blocked.load() - starting_blocked_scope;
-				break;
-			case 'a':
-				output << "OFF_CPU";
-				selected_samples = _blocked_all.load() - starting_blocked_scope;
-				break;
-			default:
-				break;
-    	};
-	} else	output << selected;
+    if (_blocked_scope != 0) {
+      REQUIRE(_blocked_scope == 'a' || _blocked_scope == 'b' ||
+              _blocked_scope == 's' || _blocked_scope == 'l' ||
+              _blocked_scope == 'i' || _blocked_scope == 'o') << "No such blocked_scope!";
 
-	if (_based_line) {		//experimental feature
-		output << "(c_heavy," << based_speedup << "%|)";
-	} else if (_based_blocked) {
-		REQUIRE(_based_blocked == 'a' || _based_blocked == 'b' || _based_blocked == 's' || _based_blocked == 'l' || _based_blocked == 'i' || _based_blocked == 'o') << "No such blocked_scope!";
+      switch (_blocked_scope) {
+        case 'o':
+          output << "ON_CPU";
+          selected_samples = _blocked_oncpu.load() - starting_blocked_scope;
+          break;
+        case 'i':
+          output << "IO";
+          selected_samples = _blocked_io.load() - starting_blocked_scope;
+          break;
+        case 'l':
+          output << "LOCK";
+          selected_samples = _blocked_lock.load() - starting_blocked_scope;
+          break;
+        case 's':
+          output << "SCHEDULING";
+          selected_samples = _blocked_sched.load() - starting_blocked_scope;
+          break;
+        case 'b':
+          output << "BLOCKED";
+          selected_samples = _blocked_blocked.load() - starting_blocked_scope;
+          break;
+        case 'a':
+          output << "OFF_CPU";
+          selected_samples = _blocked_all.load() - starting_blocked_scope;
+          break;
+        default:
+          break;
+      };
+    } else	output << selected;
 
-		if (_based_blocked == 'i')	output << "(IO," << based_speedup << "%|)";
-		else if (_based_blocked == 'l')	output << "(LOCK," << based_speedup << "%|)";
-		else if (_based_blocked == 's')	output << "(SCHEDULING," << based_speedup << "%|)";
-		else if (_based_blocked == 'b')	output << "(BLOCKED," << based_speedup << "%|)";
-		else if (_based_blocked == 'a')	output << "(OFF_CPU," << based_speedup << "%|)";
-	}
+    if (_based_line) {		//experimental feature
+      output << "(c_heavy," << based_speedup << "%|)";
+    } else if (_based_blocked) {
+      REQUIRE(_based_blocked == 'a' || _based_blocked == 'b' ||
+              _based_blocked == 's' || _based_blocked == 'l' ||
+              _based_blocked == 'i' || _based_blocked == 'o') << "No such blocked_scope!";
+
+      if (_based_blocked == 'i')
+        output << "(IO," << based_speedup << "%|)";
+      else if (_based_blocked == 'l')
+        output << "(LOCK," << based_speedup << "%|)";
+      else if (_based_blocked == 's')
+        output << "(SCHEDULING," << based_speedup << "%|)";
+      else if (_based_blocked == 'b')
+        output << "(BLOCKED," << based_speedup << "%|)";
+      else if (_based_blocked == 'a')
+        output << "(OFF_CPU," << based_speedup << "%|)";
+    }
 
     // Log the experiment parameters
     output << "\tspeedup=" << speedup << "\t"
@@ -519,15 +526,15 @@ void profiler::end_sampling() {
 }
 
 bool profiler::based_match_line(perf_event::record& sample) {
-	line *l;
+  line *l;
 
-	for(uint64_t pc : sample.get_callchain()) {
-		l = memory_map::get_instance().find_line(pc-1).get();
+  for(uint64_t pc : sample.get_callchain()) {
+    l = memory_map::get_instance().find_line(pc-1).get();
 
-		if(l && (_based_line == l))	return true;
-	}
+    if(l && (_based_line == l))	return true;
+  }
 
-	return false;
+  return false;
 }
 
 std::pair<line*,bool> profiler::match_line(perf_event::record& sample) {
@@ -550,7 +557,6 @@ std::pair<line*,bool> profiler::match_line(perf_event::record& sample) {
   // Walk the callchain
   for(uint64_t pc : sample.get_callchain()) {
     // Need to subtract one. PC is the return address, but we're looking for the callsite.
-    //l = memory_map::get_instance().find_line(pc-1).get();
     l = memory_map::get_instance().find_line(pc-1).get();
     if(l){
       if(!first_hit){
@@ -572,35 +578,35 @@ std::pair<line*,bool> profiler::match_line(perf_event::record& sample) {
 void profiler::add_delays(thread_state* state) {
   // Add delays if there is an experiment running
   if(_experiment_active.load()) {
-		if (state->in_wait)	return;
-    	// Take a snapshot of the global and local delays
-    	size_t global_delay = _global_delay;
-    	size_t delay_size = _delay_size;
-		size_t based_global_delay = _based_global_delay;
+    if (state->in_wait)	return;
+    // Take a snapshot of the global and local delays
+    size_t global_delay = _global_delay;
+    size_t delay_size = _delay_size;
+    size_t based_global_delay = _based_global_delay;
 
-		if (state->based_local_delay > based_global_delay) {
-			_based_global_delay.fetch_add(state->based_local_delay - based_global_delay);
-		} else if (state->based_local_delay < based_global_delay && (based_global_delay - state->based_local_delay > 100000)) {
-			state->sampler.stop();
-			state->based_local_delay += wait(based_global_delay - state->based_local_delay - 100000);
-			state->sampler.start();
-		}
+    if (state->based_local_delay > based_global_delay) {
+      _based_global_delay.fetch_add(state->based_local_delay - based_global_delay);
+    } else if (state->based_local_delay < based_global_delay &&
+               (based_global_delay - state->based_local_delay > 100000)) {
+      state->sampler.stop();
+      state->based_local_delay += wait(based_global_delay - state->based_local_delay - 100000);
+      state->sampler.start();
+    }
 		
-		// Is this thread ahead or behind on delays?
-		if(state->local_delay > global_delay) {
-		// Thread is ahead: increase the global delay time to make other threads pause
-			_global_delay.fetch_add(state->local_delay - global_delay);
-			//_global_delay.store(state->local_delay);
-    	} else if(state->local_delay < global_delay && (global_delay - state->local_delay > 100000)) {
-    		// Thread is behind: Pause this thread to catch up
+    // Is this thread ahead or behind on delays?
+    if (state->local_delay > global_delay) {
+      // Thread is ahead: increase the global delay time to make other threads pause
+      _global_delay.fetch_add(state->local_delay - global_delay);
+    } else if (state->local_delay < global_delay &&
+               (global_delay - state->local_delay > 100000)) {
+      // Thread is behind: Pause this thread to catch up
     		  
-    		// Pause and record the exact amount of time this thread paused
-    		state->sampler.stop();
-    		state->local_delay += wait(global_delay - state->local_delay - 100000);
-    		state->sampler.start();
+      // Pause and record the exact amount of time this thread paused
+      state->sampler.stop();
+      state->local_delay += wait(global_delay - state->local_delay - 100000);
+      state->sampler.start();
 			  
-			//if (state->local_delay > _global_delay)	omit_experiment = true;
-    	}
+    }
   } else {
     // Just skip ahead on delays if there isn't an experiment running
     state->local_delay = _global_delay;
@@ -609,94 +615,99 @@ void profiler::add_delays(thread_state* state) {
 }
 
 void profiler::process_blocked_samples(thread_state* state) {
-	bool process_blocked_sample = false;
-	size_t local_delay_inc = 0;
-	// If currently recorded samples include "off-cpu" samples, process all the samples now.
-	// Otherwise, process them in process_samples().
+  bool process_blocked_sample = false;
+  size_t local_delay_inc = 0;
+  // If currently recorded samples include "off-cpu" samples, process all the samples now.
+  // Otherwise, process them in process_samples().
 
-	if (state->process_samples.load())	return;
+  if (state->process_samples.load())	return;
 
-	state->process_samples.fetch_add(1);
+  state->process_samples.fetch_add(1);
 
-	// Read recorded samples
-	for (perf_event::record r : state->sampler) {
-		if (r.is_sample()) {
-			REQUIRE(r.get_time() >= state->last_sample_time) << "Already processed sample!";
+  // Read recorded samples
+  for (perf_event::record r : state->sampler) {
+    if (r.is_sample()) {
+      REQUIRE(r.get_time() >= state->last_sample_time) << "Already processed sample!";
 			
-			state->last_sample_time = r.get_time();
+      state->last_sample_time = r.get_time();
 
-			// Find and matches the line that contains this sample.
-			// If, process_blocked_sample is true, process recorded sample directly.
-			// Otherwise, save read samples and process them in process_samples().
+      // Find and matches the line that contains this sample.
+      // If, process_blocked_sample is true, process recorded sample directly.
+      // Otherwise, save read samples and process them in process_samples().
 
-			std::pair<line*, bool> sampled_line = match_line(r);
-			if (sampled_line.first)	sampled_line.first->add_sample(r.get_weight() + 1);
+      std::pair<line*, bool> sampled_line = match_line(r);
+      if (sampled_line.first)	sampled_line.first->add_sample(r.get_weight() + 1);
 
-			// Accumulate local delay increasement in local_delay_inc.
-			if (_experiment_active.load()) {
-				if (_based_blocked != 0) {
-					if (((_based_blocked == 'i') && r.is_io()) || ((_based_blocked == 'l') && r.is_lock()) \
-						|| ((_based_blocked == 's') && r.is_sched()) || ((_based_blocked == 'b') && r.is_blocked()) \
-						|| ((_based_blocked == 'a') && r.is_blocked_any()))
-						state->based_local_delay += _based_delay_size * (r.get_weight() + 1);
-				}
-				else if (_based_line && based_match_line(r))	state->based_local_delay += _based_delay_size * (r.get_weight() + 1);
+      // Accumulate local delay increasement in local_delay_inc.
+      if (_experiment_active.load()) {
+        if (_based_blocked != 0) {
+          if ((_based_blocked == 'i') && r.is_io() ||
+              (_based_blocked == 'l') && r.is_lock() ||
+              (_based_blocked == 's') && r.is_sched() ||
+              (_based_blocked == 'b') && r.is_blocked() ||
+              (_based_blocked == 'a') && r.is_blocked_any())
+            state->based_local_delay += _based_delay_size * (r.get_weight() + 1);
+        } else if (_based_line && based_match_line(r)) {
+          state->based_local_delay += _based_delay_size * (r.get_weight() + 1);
+        }
 
-				// If blocked_scope is specified, skip the line-based virtual speedup
-				// Add a delay if the sample is included in blocked_scope
-				if (_blocked_scope != 0) {
-					if ((_blocked_scope == 'i') && r.is_io()) {
-						_blocked_io.fetch_add(r.get_weight() + 1);
-					} else if ((_blocked_scope == 'l') && r.is_lock()) {
-						_blocked_lock.fetch_add(r.get_weight() + 1);
-					} else if ((_blocked_scope == 's') && r.is_sched()) {
-						_blocked_sched.fetch_add(r.get_weight() + 1);
-					} else if ((_blocked_scope == 'b') && r.is_blocked()) {
-						_blocked_blocked.fetch_add(r.get_weight() + 1);
-					} else if ((_blocked_scope == 'a') && r.is_blocked_any()) {
-						_blocked_all.fetch_add(r.get_weight() + 1);
-					} else if ((_blocked_scope == 'o') && !r.is_blocked_any()){
-						_blocked_oncpu.fetch_add(r.get_weight() + 1);
-						state->delayed_local_delay += _delay_size * (r.get_weight() + 1);
-						continue;
-					} else	continue;
+        // If blocked_scope is specified, skip the line-based virtual speedup
+        // Add a delay if the sample is included in blocked_scope
+        if (_blocked_scope != 0) {
+          if ((_blocked_scope == 'i') && r.is_io()) {
+            _blocked_io.fetch_add(r.get_weight() + 1);
+          } else if ((_blocked_scope == 'l') && r.is_lock()) {
+            _blocked_lock.fetch_add(r.get_weight() + 1);
+          } else if ((_blocked_scope == 's') && r.is_sched()) {
+            _blocked_sched.fetch_add(r.get_weight() + 1);
+          } else if ((_blocked_scope == 'b') && r.is_blocked()) {
+            _blocked_blocked.fetch_add(r.get_weight() + 1);
+          } else if ((_blocked_scope == 'a') && r.is_blocked_any()) {
+            _blocked_all.fetch_add(r.get_weight() + 1);
+          } else if ((_blocked_scope == 'o') && !r.is_blocked_any()){
+            _blocked_oncpu.fetch_add(r.get_weight() + 1);
+            state->delayed_local_delay += _delay_size * (r.get_weight() + 1);
+            continue;
+          } else	continue;
 
-					local_delay_inc += _delay_size * (r.get_weight() + 1);
-					process_blocked_sample = true;
+          local_delay_inc += _delay_size * (r.get_weight() + 1);
+          process_blocked_sample = true;
 
-					continue;
-				}
+          continue;
+        }
 
-				if (sampled_line.second && !r.is_lock()) {
-					if (r.is_blocked_any()) {
-						local_delay_inc += _delay_size * (r.get_weight() + 1);
-						process_blocked_sample = true;
-					} else {
-						state->delayed_local_delay += _delay_size * (r.get_weight() + 1);	
-					}
-				}
-			}
-		}		
-	}
+        if (sampled_line.second && !r.is_lock()) {
+          if (r.is_blocked_any()) {
+            local_delay_inc += _delay_size * (r.get_weight() + 1);
+            process_blocked_sample = true;
+          } else {
+            state->delayed_local_delay += _delay_size * (r.get_weight() + 1);	
+          }
+        }
+      }
+    }		
+  }
 
-	if (_experiment_active.load()) {
-		if (process_blocked_sample) {
-			state->local_delay += local_delay_inc;
-			add_delays(state);
-		}
-	} else {
-		state->local_delay = _global_delay;
-		state->delayed_local_delay = 0;
-	}
+  if (_experiment_active.load()) {
+    if (process_blocked_sample) {
+      state->local_delay += local_delay_inc;
+      add_delays(state);
+    }
+  } else {
+    state->local_delay = _global_delay;
+    state->delayed_local_delay = 0;
+  }
 
-	state->process_samples.fetch_add(-1);
+  state->process_samples.fetch_add(-1);
 }
 
 void profiler::process_samples(thread_state* state) {
   if (state->process_samples.load())	return;
+
   state->process_samples.fetch_add(1);
 
-  if (state->delayed_local_delay)	state->local_delay += state->delayed_local_delay;
+  if (state->delayed_local_delay)
+    state->local_delay += state->delayed_local_delay;
 
   state->delayed_local_delay = 0;
 
@@ -704,51 +715,52 @@ void profiler::process_samples(thread_state* state) {
     if(r.is_sample()) {
       REQUIRE(r.get_time() >= state->last_sample_time) << "Already processed sample!";
       
-	  state->last_sample_time = r.get_time();
+      state->last_sample_time = r.get_time();
       
-	  // Find and matches the line that contains this sample
+      // Find and matches the line that contains this sample
       std::pair<line*, bool> sampled_line = match_line(r);
       if(sampled_line.first) {
         sampled_line.first->add_sample(r.get_weight() + 1);
       }
 
       if(_experiment_active.load()) {
-		if (_based_blocked != 0) {
-			if (((_based_blocked == 'i') && r.is_io()) || ((_based_blocked == 'l') && r.is_lock()) \
-				|| ((_based_blocked == 's') && r.is_sched()) || ((_based_blocked == 'b') && r.is_blocked()) \
-				|| ((_based_blocked == 'a') && r.is_blocked_any()))
-				state->based_local_delay += _based_delay_size * (r.get_weight() + 1);
-		}
-		else if (based_match_line(r))	state->based_local_delay += _based_delay_size * (r.get_weight() + 1);
+        if (_based_blocked != 0) {
+          if ((_based_blocked == 'i') && r.is_io() ||
+              (_based_blocked == 'l') && r.is_lock() ||
+              (_based_blocked == 's') && r.is_sched() ||
+              (_based_blocked == 'b') && r.is_blocked() ||
+              (_based_blocked == 'a') && r.is_blocked_any())
+            state->based_local_delay += _based_delay_size * (r.get_weight() + 1);
+        } else if (based_match_line(r))
+          state->based_local_delay += _based_delay_size * (r.get_weight() + 1);
 
-				// If blocked_scope is specified, skip the line-based virtual speedup
-				// Add a delay if the sample is included in blocked_scope
-				if (_blocked_scope != 0) {
-					if ((_blocked_scope == 'i') && r.is_io()) {
-						_blocked_io.fetch_add(r.get_weight() + 1);
-					} else if ((_blocked_scope == 'l') && r.is_lock()) {
-						_blocked_lock.fetch_add(r.get_weight() + 1);
-					} else if ((_blocked_scope == 's') && r.is_sched()) {
-						_blocked_sched.fetch_add(r.get_weight() + 1);
-					} else if ((_blocked_scope == 'b') && r.is_blocked()) {
-						_blocked_blocked.fetch_add(r.get_weight() + 1);
-					} else if ((_blocked_scope == 'a') && r.is_blocked_any()) {
-						_blocked_all.fetch_add(r.get_weight() + 1);
-					} else if ((_blocked_scope == 'o') && !r.is_blocked_any()){
-						_blocked_oncpu.fetch_add(r.get_weight() + 1);
-					} else	continue;
+        // If blocked_scope is specified, skip the line-based virtual speedup
+        // Add a delay if the sample is included in blocked_scope
+        if (_blocked_scope != 0) {
+          if ((_blocked_scope == 'i') && r.is_io()) {
+            _blocked_io.fetch_add(r.get_weight() + 1);
+          } else if ((_blocked_scope == 'l') && r.is_lock()) {
+            _blocked_lock.fetch_add(r.get_weight() + 1);
+          } else if ((_blocked_scope == 's') && r.is_sched()) {
+            _blocked_sched.fetch_add(r.get_weight() + 1);
+          } else if ((_blocked_scope == 'b') && r.is_blocked()) {
+            _blocked_blocked.fetch_add(r.get_weight() + 1);
+          } else if ((_blocked_scope == 'a') && r.is_blocked_any()) {
+            _blocked_all.fetch_add(r.get_weight() + 1);
+          } else if ((_blocked_scope == 'o') && !r.is_blocked_any()){
+            _blocked_oncpu.fetch_add(r.get_weight() + 1);
+          } else	continue;
 
-					state->local_delay += _delay_size * (r.get_weight() + 1);
-					continue;
-				}
+          state->local_delay += _delay_size * (r.get_weight() + 1);
+          continue;
+        }
 
         // Add a delay if the sample is in the selected line
         if(sampled_line.second && !r.is_lock()) {
           state->local_delay += _delay_size * (r.get_weight() + 1);
-		}
-
+        }
       } else if(sampled_line.first != nullptr && _next_line.load() == nullptr) {
-		_next_line.store(sampled_line.first);
+        _next_line.store(sampled_line.first);
       }
     }
   }
@@ -763,7 +775,6 @@ void profiler::process_samples(thread_state* state) {
  */
 void* profiler::start_profiler_thread(void* arg) {
   spinlock* l = (spinlock*)arg;
-  //profiler::get_instance().profiler_thread(*l);
   profiler::get_instance().profiler_thread(*l);
   real::pthread_exit(nullptr);
   // Unreachable return silences compiler warning
@@ -774,18 +785,9 @@ void profiler::samples_ready(int signum, siginfo_t* info, void* p) {
   thread_state* state = profiler::get_instance().get_thread_state();
   if(state && !state->check_in_use()) {
     // Process all available samples
-    //profiler::get_instance().process_samples(state);
     profiler::get_instance().process_samples(state);
   }
 }
-
-/*void profiler::blocked_samples_ready(int signum, siginfo_t* info, void* p) {
-  thread_state* state = get_instance().get_thread_state();
-  if(state && !state->check_in_use()) {
-    // Process all available blocked samples
-    profiler::get_instance().process_blocked_samples(state);
-  }
-}*/
 
 void profiler::on_error(int signum, siginfo_t* info, void* p) {
   if(signum == SIGSEGV) {

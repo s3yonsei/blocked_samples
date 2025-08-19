@@ -41,24 +41,21 @@ static bool print_log = false;
 bool initialized = false;
 static bool init_in_progress = false;
 
-#define SHARED_PROFILER_KEY 1234
-#define SHARED_MAP_KEY 1235
-
 /* Explicit annotations for in-house barriers. */
 extern "C" void _coz_pre_block() {
-	if (initialized)	profiler::get_instance().pre_block();		
+  if (initialized)	profiler::get_instance().pre_block();		
 }
 
 extern "C" void _coz_post_block_0() {
-	if (initialized)	profiler::get_instance().post_block(false);		
+  if (initialized)	profiler::get_instance().post_block(false);		
 }
 
 extern "C" void _coz_post_block_1() {
-	if (initialized)	profiler::get_instance().post_block(true);		
+  if (initialized)	profiler::get_instance().post_block(true);		
 }
 
 extern "C" void _coz_catch_up() {
-	if (initialized)	profiler::get_instance().catch_up();		
+  if (initialized)	profiler::get_instance().catch_up();		
 }
 
 /**
@@ -85,11 +82,6 @@ extern "C" coz_counter_t* _coz_get_counter(progress_point_type t, const char* na
     return nullptr;
   }
 }
-
-/*extern "C" void _coz_progress_(progress_point_type t, const char* name) {
-  throughput_point *p = profiler::get_instance().get_throughput_point(name);
-  if(p)	p->visit();
-}*/
 
 /**
  * Read a link's contents and return it as a string
@@ -281,9 +273,6 @@ static void remove_coz_signals(sigset_t* set) {
   if(sigismember(set, SampleSignal)) {
     sigdelset(set, SampleSignal);
   }
-  /*if(sigismember(set, BlockedSignal)) {
-    sigdelset(set, BlockedSignal);
-  }*/
   if(sigismember(set, SIGSEGV)) {
     sigdelset(set, SIGSEGV);
   }
@@ -294,60 +283,59 @@ static void remove_coz_signals(sigset_t* set) {
 
 /// Check if a signal is required by coz
 static bool is_coz_signal(int signum) {
-  //return signum == SampleSignal || signum == SIGSEGV || signum == SIGABRT || signum == BlockedSignal;
   return signum == SampleSignal || signum == SIGSEGV || signum == SIGABRT;
 }
 
 extern "C" {
   /*int fdatasync(int fd) {
-	int result = real::fdatasync(fd);
-	if (initialized)	profiler::get_instance().call_process_blocked_samples();
+    int result = real::fdatasync(fd);
+    if (initialized)	profiler::get_instance().call_process_blocked_samples();
 
-	return result;
+    return result;
   }*/
   
   /*int fsync(int fd) {
-	int result = real::fsync(fd);
-	if (initialized)	profiler::get_instance().call_process_blocked_samples();
+    int result = real::fsync(fd);
+    if (initialized)	profiler::get_instance().call_process_blocked_samples();
 
-	return result;
+    return result;
   }*/
 
   /*int nanosleep(const struct timespec *req, struct timespec *rem) {
-	int result = real::nanosleep(req, rem);
-	if (initialized)	profiler::get_instance().call_process_samples();
+    int result = real::nanosleep(req, rem);
+    if (initialized)	profiler::get_instance().call_process_samples();
 
-	return result;
+    return result;
   }*/
   /*ssize_t pread(int fd, void *buf, size_t count, __off_t pos) {
-	ssize_t result = real::pread(fd, buf, count, pos);
-	if (initialized)	profiler::get_instance().call_process_blocked_samples();
+    ssize_t result = real::pread(fd, buf, count, pos);
+    if (initialized)	profiler::get_instance().call_process_blocked_samples();
 
-	return result;
+    return result;
   }*/
   /*ssize_t pwrite(int fd, const void *buf, size_t count, __off_t pos) {
-	ssize_t result = real::pwrite(fd, buf, count, pos);
-	if (initialized)	profiler::get_instance().call_process_blocked_samples();
+    ssize_t result = real::pwrite(fd, buf, count, pos);
+    if (initialized)	profiler::get_instance().call_process_blocked_samples();
 
-	return result;
+    return result;
   }*/
   /*void *mmap(void *mmap_addr, size_t length, int prot, int flags, int fd, __off_t offset) {
-	void *result = real::mmap(mmap_addr, length, prot, flags, fd, offset);
-	if (initialized)	profiler::get_instance().call_process_blocked_samples();
-	return result;
+    void *result = real::mmap(mmap_addr, length, prot, flags, fd, offset);
+    if (initialized)	profiler::get_instance().call_process_blocked_samples();
+    return result;
   }*/
 
   /*ssize_t write(int fd, const void *buf, size_t count) {
-	ssize_t result = real::write(fd, buf, count);
-	if (initialized)	profiler::get_instance().call_process_samples();
+    ssize_t result = real::write(fd, buf, count);
+    if (initialized)	profiler::get_instance().call_process_samples();
 
-	return result;
+    return result;
   }*/
   /*ssize_t read(int fd, void *buf, size_t count) {
-	ssize_t result = real::read(fd, buf, count);
-	if (initialized)	profiler::get_instance().call_process_samples();
+    ssize_t result = real::read(fd, buf, count);
+    if (initialized)	profiler::get_instance().call_process_samples();
 
-	return result;
+    return result;
   }*/
 
   /// Pass pthread_create calls to coz so child threads can inherit the parent's delay count
@@ -375,16 +363,14 @@ extern "C" {
   int pthread_tryjoin_np(pthread_t t, void** retval) throw() {
     if(initialized) profiler::get_instance().pre_block();
     int result = real::pthread_tryjoin_np(t, retval);
-    //if(initialized) profiler::get_instance().post_block(result == 0);
-    if(initialized) profiler::get_instance().post_block(true);
+    if(initialized) profiler::get_instance().post_block(result == 0);
     return result;
   }
 
   int pthread_timedjoin_np(pthread_t t, void** ret, const struct timespec* abstime) {
     if(initialized) profiler::get_instance().pre_block();
     int result = real::pthread_timedjoin_np(t, ret, abstime);
-    //if(initialized) profiler::get_instance().post_block(result == 0);
-    if(initialized) profiler::get_instance().post_block(true);
+    if(initialized) profiler::get_instance().post_block(result == 0);
     return result;
   }
 
@@ -436,8 +422,7 @@ extern "C" {
     int result = real::pthread_cond_timedwait(cond, mutex, time);
 
     // Skip delays only if the wait didn't time out
-    //if(initialized) profiler::get_instance().post_block(result == 0);
-    if(initialized) profiler::get_instance().post_block(true);
+    if(initialized) profiler::get_instance().post_block(result == 0);
 
     return result;
   }

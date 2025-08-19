@@ -42,14 +42,11 @@ typedef int (*main_fn_t)(int, char**, char**);
 
 enum {
   SampleSignal = SIGPROF, //< Signal to generate when samples are ready
-  //BlockedSignal = SIGUSR1, //< Signal to process blocked samples when they are injected
   SamplePeriod = 1000000, //< Time between samples (1ms)
   SampleBatchSize = 1,   //< Samples to batch together for one processing run
   SpeedupDivisions = 20,  //< How many different speedups to try (20 = 5% increments)
   ZeroSpeedupWeight = 7,  //< Weight of speedup=0 versus other speedup values (7 = ~25% of experiments run with zero speedup)
-  //ExperimentMinTime = SamplePeriod * SampleBatchSize * 50 * 20 * 2,  //< Minimum experiment length
   ExperimentMinTime = SamplePeriod * SampleBatchSize * 50,  //< Minimum experiment length
-  //ExperimentCoolOffTime = SamplePeriod * SampleBatchSize * 20 * 2,   //< Time to wait after an experiment
   ExperimentCoolOffTime = SamplePeriod * SampleBatchSize,   //< Time to wait after an experiment
   ExperimentTargetDelta = 5 //< Target minimum number of visits to a progress point during an experiment
 };
@@ -161,7 +158,6 @@ public:
     if(_experiment_active) {
       state->set_in_use(true);
       process_blocked_samples(state);
-      //add_delays(state);
       state->set_in_use(false);
     }
   }
@@ -174,9 +170,8 @@ public:
     if(state->in_wait)
       return;
 	
-	state->in_wait = true;
+    state->in_wait = true;
     state->pre_block_time = _global_delay.load();
-    //state->pre_local_time = state->local_delay;
     state->ex_count = (_experiment_active)? ex_count.load() : 0;
   }
 
@@ -191,15 +186,16 @@ public:
 
     state->set_in_use(true);
 
-    if (!_experiment_active)	state->local_delay = _global_delay.load();
-    else if (skip_delays) {
+    if (!_experiment_active) {
+      state->local_delay = _global_delay.load();
+    } else if (skip_delays) {
       state->local_delay += _global_delay.load() - state->pre_block_time;
     }
 
     state->in_wait = false;
 
-    if (_experiment_active)	process_blocked_samples(state);
-    //process_samples(state);
+    if (_experiment_active)
+      process_blocked_samples(state);
     
     state->set_in_use(false);
   }
@@ -223,7 +219,7 @@ public:
 
 private:
   profiler()  {
-  	_experiment_active.store(false);
+    _experiment_active.store(false);
     _global_delay.store(0);
     _based_global_delay.store(0);
     _delay_size.store(0);
