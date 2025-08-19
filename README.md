@@ -3,7 +3,10 @@
 [Blocked Samples](https://github.com/s3yonsei/blocked_samples) is a profiling technique based on sampling, that encompasses both on- and off-CPU events simultaneously. Based on blocked samples, we present two profilers: *bperf*, an easy-to-use sampling-based profiler and *BCOZ*, a causal profiler that profiles both on- and off-CPU events simultaneously and estimates potential speedup of optimizations.
 
 ## News
-[08/2025] Note that we're working on patching our blocked samples into Linux mainline. We've ported the blocked samples to a newer Linux kernel (6.17.0-rc2). You can try [here](https://github.com/s3yonsei/linux-blocked_samples). We've added a new event, *task-clock-plus*, to replace original *task-clock*. Therefore, when using *bperf*, you mush change the name of the sampling target. Please note that *BCOZ* requires additional changes due to the updated names of some symbols within the perf subsystem. We will release an updated version of BCOZ soon.
+[08/2025] Note that we're working on patching our blocked samples into Linux mainline. We've ported the blocked samples to a newer Linux kernel (6.17.0-rc2). You can try [here](https://github.com/s3yonsei/linux-blocked_samples).
+* We've added a new event, *task-clock-plus*, to replace original *task-clock*.
+* Therefore, when using *bperf*, you mush change the name of the sampling target.
+* Please note that *BCOZ* requires additional changes due to the updated names of some symbols within the perf subsystem. We will release an updated version of BCOZ soon.
 
 ## Related Paper
 
