@@ -4,7 +4,7 @@
 
 ## News
 [08/2025] Note that we're working on patching our blocked samples into Linux mainline. We've ported the blocked samples to a newer Linux kernel (6.17.0-rc2). You can try [here](https://github.com/s3yonsei/linux-blocked_samples).
-* We've added a new event, *task-clock-plus*, to replace original *task-clock*.
+* We've added a new event, *task-clock-plus*, rather than using original *task-clock*.
 * Therefore, when using *bperf*, you mush change the name of the sampling target.
 * Please note that *BCOZ* requires additional changes due to the updated names of some symbols within the perf subsystem. We will release an updated version of BCOZ soon.
 
